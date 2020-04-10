@@ -1,5 +1,5 @@
 ;;; -------------------------------------------------------------------------
-;;; Copyright 2011-2016, SIFT, LLC, Robert P. Goldman, and Ugur Kuter
+;;; Copyright 2011-2020, SIFT, LLC, Robert P. Goldman, and Ugur Kuter
 ;;; Available under the BSD 3-clause license, see license.txt
 ;;;---------------------------------------------------------------------------
 
