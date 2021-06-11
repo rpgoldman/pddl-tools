@@ -37,56 +37,53 @@
                                                 next-parent-type)))))))
     t))
 
-(handler-bind ((it.bese.arnesi:deflookup-redefinition
-                (lambda (warn)
-                  (muffle-warning warn))))
-  (def-fixture domains ()
-    (let* (
-           #|(domain-extensions
-           (read-planning-input
-           "obtw:S3;disturbance-analyzer;counter-domains;airport;airportlog-debugging-domain.pddl")) |#
-           (orig-domain
-            (read-planning-input
-             (merge-pathnames "airport-nontemporal-adl-domain.pddl"
-                              *tests-dir*)))
-           (openstacks-domain
-            (read-planning-input
-             (merge-pathnames "openstacks-strips.pddl"
-                              *tests-dir*)))
-           #|
-           (merged-domain
-           (make-debugging-domain (remove-domain-actions orig-domain) domain-extensions))
-           |#
-           )
-      (&body)))
-
-
-  (def-fixture simple-problem ()
-    (let ((problem (read-pddl-file
-                    (merge-pathnames "airport-nontemporal-adl-p01_airport1_p1.pddl"
-                                     *tests-dir*))))
-      (&body)))
-
-  ;; This could also go into the SIMPLE-PROBLEM fixture/test above, but I'm doing it
-  ;; seperately for now since I'm just getting familiar with FiveAM facilities.
-  ;; [2011/11/22:uk].
-  (def-fixture well-defined-pddl-objects ()
-    (let ((domain
+(def-fixture domains ()
+  (let* (
+         #|(domain-extensions
+         (read-planning-input
+         "obtw:S3;disturbance-analyzer;counter-domains;airport;airportlog-debugging-domain.pddl")) |#
+         (orig-domain
            (read-planning-input
             (merge-pathnames "airport-nontemporal-adl-domain.pddl"
-                             *tests-dir*))))
-      (&body)))
-
-  (def-fixture well-defined-predicate-settings ()
-    (let ((domain
+                             *tests-dir*)))
+         (openstacks-domain
            (read-planning-input
-            (merge-pathnames "airport-nontemporal-adl-domain.pddl"
-                             *tests-dir*))))
-      (setf (domain-predicates domain) 
-            (append (domain-predicates domain)
-                    (list '(DONE))))
-      (&body)))
-)
+            (merge-pathnames "openstacks-strips.pddl"
+                             *tests-dir*)))
+         #|
+         (merged-domain
+         (make-debugging-domain (remove-domain-actions orig-domain) domain-extensions))
+         |#
+         )
+    (&body)))
+
+
+(def-fixture simple-problem ()
+  (let ((problem (read-pddl-file
+                  (merge-pathnames "airport-nontemporal-adl-p01_airport1_p1.pddl"
+                                   *tests-dir*))))
+    (&body)))
+
+;; This could also go into the SIMPLE-PROBLEM fixture/test above, but I'm doing it
+;; seperately for now since I'm just getting familiar with FiveAM facilities.
+;; [2011/11/22:uk].
+(def-fixture well-defined-pddl-objects ()
+  (let ((domain
+          (read-planning-input
+           (merge-pathnames "airport-nontemporal-adl-domain.pddl"
+                            *tests-dir*))))
+    (&body)))
+
+(def-fixture well-defined-predicate-settings ()
+  (let ((domain
+          (read-planning-input
+           (merge-pathnames "airport-nontemporal-adl-domain.pddl"
+                            *tests-dir*))))
+    (setf (domain-predicates domain) 
+          (append (domain-predicates domain)
+                  (list '(DONE))))
+    (&body)))
+
 
 (test types-correct-p
       (with-fixture 
