@@ -17,7 +17,7 @@
     :pathname "hddl-utils/"
     :components ((:file "package")      ; Package definition.
                  (:file "decls" :depends-on ("package"))
-                 #+nil(:file "commons" :depends-on ("package" "decls"))
+                 (:file "commons" :depends-on ("package" "decls"))
                  #+nil(:file "merger" :depends-on ("package"))
                  #+nil(:file "problem-macros" :depends-on ("package"))
 ;                 (:file "object-methods" :depends-on ("package" "decls"))
@@ -32,6 +32,5 @@
   :test-names ((#:hddl-tests . :hddl-utils-tests)
                )
   :pathname "hddl-utils/tests/"
-  :components ((:file "package")
-               (:file "hddl-data")
-               (:file "tests")))
+  :components ((:file "tests")
+               (:file "hddl-data")))
