@@ -154,7 +154,7 @@
    ))
 
 (defpackage pddl-io
-  (:use :common-lisp)
+  (:use :common-lisp :iterate)
   (:nicknames pddl-pprinter)
   (:export #:canonicalize-types
            #:pddl-symbol)

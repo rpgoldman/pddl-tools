@@ -310,6 +310,16 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
   (remove-if-not #'(lambda (x) (eq x :action))
                  (cddr domain) :key 'first))
 
+(defsetf domain-actions (domain) (action-list)
+  `(progn
+     (check-type ,domain domain)
+     ;; remove all the old actions
+     (setf (cddr ,domain)
+           (remove :action (cddr ,domain)
+                   :key #'first))
+     (alexandria:appendf (cddr ,domain)
+              ,action-list)))
+
 (defun remove-domain-actions (domain)
   (assert (domain-p domain))
   `(,(pddl-symbol 'pddl:define) ,(second domain)
@@ -558,3 +568,28 @@ Translates to (constant . type) alist."
   (iterate (for (constant dash type . nil) on typed-list by 'cdddr)
     (assert (eq dash '-))
     (collecting (cons constant type))))
+
+(defun positive-literal-p (sexp &key (predicates nil predicates-supplied-p))
+  (and (listp sexp)
+       (not (eq (first sexp) 'not))
+       (if predicates-supplied-p
+           (member (first sexp) predicates)
+           t)))
+
+(defun flatten-conjunction (conj)
+  "Take an s-expression and, if it is a multilayer conjunction,
+make it a single-layer conjunction (intermediate AND's removed)."
+  (labels ((flatten-1 (conj)
+             ;; return the conj with any outside AND removed and
+             ;; flattened
+             (case (first conj)
+               (and (alexandria:mappend 'flatten-1 (rest conj)))
+               ((or forall exists imply) (error "Cannot handle a disjunction in FLATTEN-CONJUNCTION:~%~t~s" conj))
+               (not (assert (= (length conj) 2))
+                (if (positive-literal-p (second conj))
+                    conj
+                    (error "Cannot handle negations other than negated literals in flatten-conjunction: ~s"
+                           conj))))))
+    (if (eq (first conj) 'and)
+        `(and ,@ (flatten-1 conj))
+        (flatten-1 conj))))

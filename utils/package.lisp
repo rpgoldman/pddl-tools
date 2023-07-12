@@ -72,7 +72,7 @@
    #:domain-actions
    #:domain-constants
    #:action-precondition
-   #:action-effects
+   #:action-effect
    #:action-name
    #:action-params
 
@@ -110,6 +110,8 @@
    #:print-pddl-plan
    #:read-pddl-plan
    #:read-pddl-plan-file
+   #:pddlify
+   #:pddlify-tree
 
    ;; types
    #:action

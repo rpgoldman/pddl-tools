@@ -9,10 +9,11 @@
 (in-package :sift-pddl-asd)
 
 (defsystem :pddl
-  :version "1.0"
+  :version "1.1"
   :license "BSD 3-clause (see license.txt)"
   :serial t
   :pathname "pddl/"
+  :depends-on ("iterate")
   :description "This system provides a package into which PDDL constructs
 can be read, so that they can be shared across different programs manipulating
 PDDL.  Also provides a PDDL pretty-printer."
