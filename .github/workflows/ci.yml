@@ -25,7 +25,7 @@ jobs:
         os: [ubuntu-latest]
         lisp:
           - sbcl
-          # - ccl
+          - ccl
           # - allegro
           # installation of quicklisp fails on Allegro for some reason. Have to fix this later.
 
