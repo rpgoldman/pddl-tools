@@ -39,7 +39,7 @@ jobs:
 
     - name: install-modern-asdf
       run:
-        mkdir /asdf && cd /asdf && wget -l https://asdf.common-lisp.dev/archives/asdf.lisp
+        mkdir /asdf && cd /asdf && wget https://asdf.common-lisp.dev/archives/asdf.lisp
 
     - name: SBCL
       if: ${{ matrix.lisp == 'sbcl' }}
