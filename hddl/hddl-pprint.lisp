@@ -13,16 +13,16 @@
 ;;;---------------------------------------------------------------------------
 (defun hddlify (sym)
   (let ((pddl-io::*pddl-package* hddl-io::*hddl-package*))
-    (pddlify sym)))
+    (pddl-utils::pddlify sym)))
 
 (defun hddl-symbol (symd)
   (let ((pddl-io::*pddl-package* hddl-io::*hddl-package*))
-    (pddl-symbol symd)))
+    (pddl-utils::pddl-symbol symd)))
 
 
-(defun hddlify-tree (tree)
+g(defun hddlify-tree (tree)
   (let ((pddl-io::*pddl-package* hddl-io::*hddl-package*))
-    (pddlify-tree tree)))
+    (pddl-utils::pddlify-tree tree)))
 
 
 (locally (declare #+sbcl (sb-ext:muffle-conditions style-warning))
