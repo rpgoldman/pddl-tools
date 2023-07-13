@@ -12,9 +12,7 @@
 
 (in-package :test)
 
-(let ((home-dir (uiop:getenv "HOME")))
-  (unless home-dir
-    (error "HOME environment variable not bound in container."))
+(let ((home-dir (user-homedir-pathname)))
   (let ((path (uiop:ensure-directory-pathname home-dir)))
     (load (merge-pathnames "setup.lisp" path))))
 
