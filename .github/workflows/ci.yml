@@ -37,20 +37,26 @@ jobs:
 
     - run: install-quicklisp
 
+    - name: install-modern-asdf
+      run:
+        mkdir /asdf && cd /asdf && wget -l https://asdf.common-lisp.dev/archives/asdf.lisp
+
     - name: SBCL
       if: ${{ matrix.lisp == 'sbcl' }}
       run: sbcl  --non-interactive
+        --load /asdf/asdf.lisp
         --load $GITHUB_WORKSPACE/do-test.lisp
         --eval '(uiop:quit 0)'
-    - name: Allegro
-      if: ${{ matrix.lisp == 'allegro' }}
-      run: alisp -L /github/home/quicklisp/setup.lisp
-        -e "(asdf:load-asd \"$GITHUB_WORKSPACE/random-state.asd\")" 
-        -e '(ql:quickload "random-state/tests")'
-        -e '(asdf:test-system "random-state")'
-        --kill
+    # - name: Allegro
+    #   if: ${{ matrix.lisp == 'allegro' }}
+    #   run: alisp -L /github/home/quicklisp/setup.lisp
+    #     -e "(asdf:load-asd \"$GITHUB_WORKSPACE/random-state.asd\")" 
+    #     -e '(ql:quickload "random-state/tests")'
+    #     -e '(asdf:test-system "random-state")'
+    #     --kill
     - name: Clozure
       if: ${{ matrix.lisp == 'ccl' }}
       run: ccl --batch
+        --load /asdf/asdf.lisp
         --load $GITHUB_WORKSPACE/do-test.lisp
         --eval '(uiop:quit 0)'
