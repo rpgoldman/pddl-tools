@@ -37,9 +37,10 @@
        (ql:quickload ,name :silent nil :verbose t))))
 
 (build-system "pddl-utils")
-;; (build-system "hddl-utils")
+(build-system "hddl-utils")
 
 (ql:quickload "pddl-utils/tests")
+(ql:quickload "hddl-utils/tests")
 
 (defmacro test-system (name)
   `(handler-case
@@ -48,6 +49,6 @@
        (uiop:quit 1))))
 
 (test-system "pddl-utils")
-;; (test-system "hddl-utils")
+(test-system "hddl-utils")
 
 (uiop:quit 0)
