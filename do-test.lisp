@@ -16,8 +16,7 @@
   (unless home-dir
     (error "HOME environment variable not bound in container."))
   (let ((path (uiop:ensure-directory-pathname home-dir)))
-    (load (merge-pathnames "setup.lisp")
-          path)))
+    (load (merge-pathnames "setup.lisp" path))))
 
 (push (namestring (uiop:pathname-directory-pathname *load-truename*)) ql:*local-project-directories*)
 
