@@ -39,6 +39,8 @@
 (build-system "pddl-utils")
 ;; (build-system "hddl-utils")
 
+(ql:quickload "pddl-utils/tests")
+
 (defmacro test-system (name)
   `(handler-case
        (asdf:test-system ,name)
