@@ -107,7 +107,7 @@
 
 (test manipulate-domain-tasks
   (let ((full-domain (read-hddl-file (asdf:system-relative-pathname "hddl-utils" "hddl-utils/tests/transport-domain-partial-order-ipc2020.hddl")))
-        (empty-domain (read-hddl-file (asdf:system-relative-pathname "hddl-utils" "hddl-utils/tests/transport-domain-ipc2020-no-methods-or-actions.hddl"))))
+        (empty-domain (read-hddl-file (asdf:system-relative-pathname "hddl-utils" "hddl-utils/tests/transport-domain-ipc2020-no-methods-tasks-or-actions.hddl"))))
     ;; splice tasks into a domain that doesn't have any
     (let ((task-spliced-domain (remove-domain-tasks full-domain)))
       (is-true (typep task-spliced-domain 'domain))

@@ -14,20 +14,4 @@
 		(in ?arg0 - package ?arg1 - vehicle)
 		(capacity ?arg0 - vehicle ?arg1 - capacity_number)
 		(capacity_predecessor ?arg0 - capacity_number ?arg1 - capacity_number)
-	)
-
-	(:task deliver
-		:parameters (?p - package ?l - location)
-	)
-
-	(:task get_to
-		:parameters (?v - vehicle ?l - location)
-	)
-
-	(:task load
-		:parameters (?v - vehicle ?l - location ?p - package)
-	)
-
-	(:task unload
-		:parameters (?v - vehicle ?l - location ?p - package)
 	))
