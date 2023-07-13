@@ -25,21 +25,22 @@
     (pddlify-tree tree)))
 
 
-(defun pprint-hddl (sexp &optional (stream t) &key (canonical nil))
-  "Pretty-print an HDDL plan or domain.
+(locally (declare #+sbcl (sb-ext:muffle-conditions style-warning))
+  (defun pprint-hddl (sexp &optional (stream t) &key (canonical nil))
+    "Pretty-print an HDDL plan or domain.
   If the CANONICAL keyword argument is T, then typed lists will be
 printed in \"canonical form\", as pairs like:
 FOO - TYPE1 BAR - TYPE1 BAZ - TYPE2
 instead of \"minimal form\" like
 FOO BAR - TYPE1 BAZ - TYPE2."
-  (let ((*print-pprint-dispatch* *hddl-pprint-dispatch*)
-        (*package* (find-package *hddl-package*))
-        (*canonical* canonical)
-        *is-problem* *is-domain*)
-    (cond ((domain-p sexp) (setf *is-domain* t))
-          ((problem-p sexp) (setf *is-problem* t))
-          (t (error "Can't determine if argument is problem or domain.")))
-    (pprint sexp stream)))
+    (let ((*print-pprint-dispatch* *hddl-pprint-dispatch*)
+          (*package* (find-package *hddl-package*))
+          (*canonical* canonical)
+          *is-problem* *is-domain*)
+      (cond ((domain-p sexp) (setf *is-domain* t))
+            ((problem-p sexp) (setf *is-problem* t))
+            (t (error "Can't determine if argument is problem or domain.")))
+      (pprint sexp stream))))
 
 (defun read-hddl-file (dom-prob-file)
   "Takes a domain or problem file and returns its s-expression."
@@ -112,7 +113,7 @@ in the form of a list of actions."
                      (mapcar #'hddl-symbol components)))
                   (:s-expression
                    (let ((*package* *hddl-package*))
-                     (read-from-string line :start (1+ pos))))
+                     (read-from-string line t nil :start (1+ pos))))
                   (:default
                    (space-separated-string->hddl-list (subseq line pos))
                    (let ((components
