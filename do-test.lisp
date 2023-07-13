@@ -14,7 +14,7 @@
 
 (let ((home-dir (user-homedir-pathname)))
   (let ((path (uiop:ensure-directory-pathname home-dir)))
-    (load (merge-pathnames "setup.lisp" path))))
+    (load (merge-pathnames "quicklisp/setup.lisp" path))))
 
 (push (namestring (uiop:pathname-directory-pathname *load-truename*)) ql:*local-project-directories*)
 
