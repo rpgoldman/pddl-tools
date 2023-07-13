@@ -21,10 +21,11 @@
 (ql:quickload "fiveam-asdf")            ; without this, the ASDF defsystems don't load properly.
 
 (handler-case
- (assert (uiop:pathname-equal (asdf:component-pathname (asdf:find-system "pddl-utils"))
+    (assert (uiop:pathname-equal (uiop:pathname-directory-pathname (asdf:component-pathname (asdf:find-system "pddl-utils")))
                               (uiop:pathname-directory-pathname *load-truename*)))
-  (error () (uiop:die 2 "Not loading PDDL-tools from the expected location: ~A."
-                       (asdf:component-pathname (asdf:find-system "pddl-utils")))))
+  (error () (uiop:die 2 "Not loading PDDL-tools from the expected location: ~A instead of expected ~a."
+                       (asdf:component-pathname (asdf:find-system "pddl-utils"))
+                       )))
 
 ;;; check for clean build
 (defmacro build-system (name)
