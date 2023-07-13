@@ -12,6 +12,8 @@
 
 (in-package :test)
 
+(load "/root/quicklisp/setup.lisp")
+
 (push (namestring (uiop:pathname-directory-pathname *load-truename*)) ql:*local-project-directories*)
 
 (handler-case
