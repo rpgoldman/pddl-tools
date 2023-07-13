@@ -12,9 +12,6 @@
 
 (in-package :test)
 
-(load (merge-pathnames (make-pathname :directory '(:relative "quicklisp") :name "setup" :type "lisp")
-                       (user-homedir-pathname)))
-
 (push (namestring (uiop:pathname-directory-pathname *load-truename*)) ql:*local-project-directories*)
 
 (handler-case
