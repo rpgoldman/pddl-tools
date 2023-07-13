@@ -20,7 +20,8 @@
 (handler-case
  (assert (uiop:pathname-equal (asdf:component-pathname (asdf:find-system "pddl-utils"))
                               (uiop:pathname-directory-pathname *load-truename*)))
-  (error () (uiop:die 2 "Not loading RANDOM-STATE from the expected location.")))
+  (error () (uiop:die 2 "Not loading PDDL-tools from the expected location: ~A."
+                       (asdf:component-pathname (asdf:find-system "pddl-utils")))))
 
 ;;; check for clean build
 (defmacro build-system (name)
