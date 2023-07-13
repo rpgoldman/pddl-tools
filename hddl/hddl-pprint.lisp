@@ -20,7 +20,7 @@
     (pddl-utils::pddl-symbol symd)))
 
 
-g(defun hddlify-tree (tree)
+(defun hddlify-tree (tree)
   (let ((pddl-io::*pddl-package* hddl-io::*hddl-package*))
     (pddl-utils::pddlify-tree tree)))
 
