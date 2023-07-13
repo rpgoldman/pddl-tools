@@ -18,23 +18,23 @@
 ;;; Interface functions
 ;;;---------------------------------------------------------------------------
 
-
-(defun pprint-pddl (sexp &optional (stream t) &key (canonical nil))
-  "Pretty-print a PDDL plan or domain.  Carefully crafted to
+(locally (declare #+sbcl (sb-ext:muffle-conditions style-warning))
+  (defun pprint-pddl (sexp &optional (stream t) &key (canonical nil))
+    "Pretty-print a PDDL plan or domain.  Carefully crafted to
 generate PDDL that the FF PDDL parser will read.
   If the CANONICAL keyword argument is T, then typed lists will be
 printed in \"canonical form\", as pairs like:
 FOO - TYPE1 BAR - TYPE1 BAZ - TYPE2
 instead of \"minimal form\" like
 FOO BAR - TYPE1 BAZ - TYPE2."
-  (let ((*print-pprint-dispatch* *pddl-pprint-dispatch*)
-        (*package* (find-package *pddl-package*))
-        (*canonical* canonical)
-        *is-problem* *is-domain*)
-    (cond ((domain-p sexp) (setf *is-domain* t))
-          ((problem-p sexp) (setf *is-problem* t))
-          (t (error "Can't determine if argument is problem or domain.")))
-    (pprint sexp stream)))
+    (let ((*print-pprint-dispatch* *pddl-pprint-dispatch*)
+          (*package* (find-package *pddl-package*))
+          (*canonical* canonical)
+          *is-problem* *is-domain*)
+      (cond ((domain-p sexp) (setf *is-domain* t))
+            ((problem-p sexp) (setf *is-problem* t))
+            (t (error "Can't determine if argument is problem or domain.")))
+      (pprint sexp stream))))
 
 (defun read-pddl-file (dom-prob-file)
   "Takes a domain or problem file and returns its s-expression."
