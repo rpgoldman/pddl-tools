@@ -36,6 +36,10 @@
            (asdf:*compile-file-warnings-behaviour* :error))
        (ql:quickload ,name :silent nil :verbose t))))
 
+;;; this is done outside the bounds of BUILD-SYSTEM below, because
+;;; CL-PPCRE doesn't build clean (at least on SBCL).
+(ql:quickload "cl-ppcre")
+
 (build-system "pddl-utils")
 (build-system "hddl-utils")
 
