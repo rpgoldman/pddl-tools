@@ -18,6 +18,8 @@
 
 (push (namestring (uiop:pathname-directory-pathname *load-truename*)) ql:*local-project-directories*)
 
+(ql:quickload "fiveam-asdf")            ; without this, the ASDF defsystems don't load properly.
+
 (handler-case
  (assert (uiop:pathname-equal (asdf:component-pathname (asdf:find-system "pddl-utils"))
                               (uiop:pathname-directory-pathname *load-truename*)))
@@ -31,8 +33,6 @@
      (let ((asdf:*compile-file-failure-behaviour* :error)
            (asdf:*compile-file-warnings-behaviour* :error))
        (ql:quickload ,name :silent nil :verbose t))))
-
-(ql:quickload "fiveam-asdf")            ; without this, the ASDF defsystems don't load properly.
 
 (build-system "pddl-utils")
 ;; (build-system "hddl-utils")
