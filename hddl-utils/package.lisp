@@ -36,10 +36,13 @@
   (:use :common-lisp :hddl :iterate :pddl-utils :hddl-pprinter)
   (:nicknames :hddl-utils)
   ;; this one is different in HDDL as is the SETF method for domain actions...
-  (:shadow #:insert-domain-actions #:domain-actions)
+  (:shadow #:insert-domain-actions #:domain-actions
+           #:make-domain #:make-problem
+           #:canonicalize-domain)
   (:reexport :pddl-utils :hddl-pprinter)
   (:import-from :pddl-utils
                 #:action-sexp-p
+                #:has-element-p
                 #:durative-action-sexp-p)
   #+nil (:import-from #:pddl-pprinter
                       #:complex-task-sexp-p

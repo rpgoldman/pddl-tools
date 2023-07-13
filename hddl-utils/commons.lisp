@@ -5,63 +5,6 @@
 
 (in-package :hddl-utils)
 
-;; (deftype domain ()
-;;   `(and list (satisfies domain-sexp-p)))
-
-;; (deftype problem ()
-;;   `(and list (satisfies problem-sexp-p)))
-
-;; (deftype action ()
-;;   `(and list (satisfies action-sexp-p)))
-
-
-;; (defun domain-p (x)
-;;   (typep x 'domain))
-
-;; (defun action-p (x)
-;;   "Simple test to see if an s-expression is a PDDL action."
-;;   (typep x 'action))
-
-
-;; (defun problem-p (x)
-;;   (typep x 'problem))
-
-;; (defun domain-sexp-p (domain-expr)
-;;   (and (eq (first domain-expr) (pddl-symbol 'pddl:define))
-;;        (eq (first (second domain-expr)) (pddl-symbol 'pddl:domain))))
-
-;; (defun problem-sexp-p (problem-expr)
-;;   (and (eq (first problem-expr) (pddl-symbol 'pddl:define))
-;;        (eq (first (second problem-expr)) (pddl-symbol 'pddl:problem))))
-
-;; (defun action-sexp-p (problem-expr)
-;;   (eq (first problem-expr) :action))
-
-;; (defun durative-action-sexp-p (problem-expr)
-;;   (eq (first problem-expr) :durative-action))
-
-;; Primitives:
-(defun problem-element (problem pddl-keyword)
-  (assert (problem-p problem))
-  (let ((head (find-if #'(lambda(e)
-                           (and (listp e) (eq (car e) pddl-keyword)))
-                       problem)))
-    (rest head)))
-
-;; Getter/setter functions for PDDL expressions:
-(defun domain-element (domain-expr pddl-keyword)
-  (assert (domain-p domain-expr))
-  (let ((head (find-if #'(lambda(e)
-                           (and (listp e) (eq (car e) pddl-keyword)))
-                       domain-expr)))
-    (rest head)))
-
-(defun has-element-p (domain-expr pddl-keyword)
-  (assert (domain-p domain-expr))
-  (find-if #'(lambda(e)
-               (and (listp e) (eq (car e) pddl-keyword)))
-           domain-expr))
-
 ;; makers
 (defun make-domain (name &key requirements constants predicates actions
                     types tasks methods)
@@ -98,12 +41,16 @@
         (constants
           (when (has-element-p old-domain :constants)
             (domain-constants old-domain)))
+        (methods (domain-methods old-domain))
+        (tasks (domain-tasks old-domain))
         (actions (domain-actions old-domain)))
     (make-domain (domain-name old-domain)
              :requirements requirements
              :types types
              :constants constants
              :predicates predicates
+             :tasks tasks
+             :methods methods
              :actions actions)))
 
 (defun make-problem (name &key requirements domain objects init goal
@@ -133,12 +80,6 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
          (:objects ,@objects)
          (:init ,@init)
          (:goal ,goal)))))
-
-(defmethod copy-domain ((domain list))
-  (copy-tree domain))
-
-(defmethod copy-problem ((problem list))
-  (copy-tree problem))
 
 
 ;;; misc utility
