@@ -44,7 +44,7 @@
 (defmacro test-system (name)
   `(handler-case
        (asdf:test-system ,name)
-     (fiveam-asdf:fiveam-asdf-test-failure ()
+     (fiveam-asdf:fiveam-test-fail ()
        (uiop:quit 1))))
 
 (test-system "pddl-utils")
