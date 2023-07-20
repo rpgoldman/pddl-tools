@@ -72,5 +72,6 @@
            #:read-hddl-plan-file
            #:hddl-symbol
            #:hddlify
-           #:hddlify-tree))
+           #:hddlify-tree
+           #:*hddl-package*))
 
