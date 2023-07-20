@@ -12,7 +12,7 @@
   :version "1.0"
   :license "BSD 3-clause (see license.txt)"
   :serial t
-  :depends-on ((:version "pddl" "1.1") "cl-ppcre")
+  :depends-on ((:version "pddl" "1.1") "pddl-utils" "cl-ppcre")
   :pathname "hddl/"
   :description "This system provides a package into which HDDL constructs
 can be read, so that they can be shared across different programs manipulating
