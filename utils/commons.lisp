@@ -217,11 +217,14 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
 (defsetf problem-goal (prob) (goal)
   `(progn
      (assert (problem-p ,prob))
-     (setf
-      (cdr
-       (find :goal (cddr ,prob) :key 'first))
-      (pddlify-tree
-       (list ,goal)))))
+     (alexandria:if-let ((cell (find :goal (cddr ,prob) :key 'first)))
+       ;; if there's already a goal, replace it
+       (setf (cdr cell)
+             (pddlify-tree
+              (list ,goal)))
+       ;; otherwise add a new goal
+       (nconc ,prob (list (list :goal ,goal))))
+     ,goal))
 
 (defun domain-predicates (domain)
   (assert (domain-p domain))
@@ -583,7 +586,7 @@ make it a single-layer conjunction (intermediate AND's removed)."
              ;; return the conj with any outside AND removed and
              ;; flattened
              (case (first conj)
-               (and (alexandria:mappend 'flatten-1 (rest conj)))
+               (and (alexandria:mappend #'flatten-1 (rest conj)))
                ((or forall exists imply) (error "Cannot handle a disjunction in FLATTEN-CONJUNCTION:~%~t~s" conj))
                (not (assert (= (length conj) 2))
                 (if (positive-literal-p (second conj))

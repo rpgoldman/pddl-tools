@@ -149,21 +149,42 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
   `(,(pddl-symbol 'pddl:define) ,(second domain)
        ,@(remove :task (cddr domain) :key 'first)))
 
+(defun before-tasks-pos (domain)
+  ;; the first two positions are for the define keyword and the domain name
+  ;; the tasks go after the last of predicates, constants, types, requirements
+  (flet ((constituent-pos (keyword)
+           (position keyword domain :from-end t :key #'(lambda (x)
+                                                         (when (listp x) (car x))))))
+    (or (constituent-pos :predicates)
+                 (constituent-pos :constants)
+                 (constituent-pos :types)
+                 (constituent-pos :requirements)
+                 1)))
+
 (defun insert-domain-task (domain task-def)
   (check-type domain domain)
-  (assert (complex-task-def-p task-def))
-  ;; Assumes the ACTIONS-LIST is a list of well-formed
-  ;; PDDL action objects.
-  `(,(pddl-symbol 'pddl:define) ,(second domain)
-    ,@(append (cddr domain) (list task-def))))
+  (assert (complex-task-sexp-p task-def))
+  (let ((last-before (before-tasks-pos domain)))
+    (append
+     (subseq domain 0 (1+ last-before))
+     (list task-def)
+     (subseq domain (1+ last-before)))))
 
 (defun insert-domain-tasks (domain task-list)
   (check-type domain domain)
-  (assert (every #'complex-task-def-p task-list))
-  ;; Assumes the ACTIONS-LIST is a list of well-formed
-  ;; PDDL action objects.
-  `(,(pddl-symbol 'pddl:define) ,(second domain)
-       ,@(append (cddr domain) task-list)))
+  (assert (every #'complex-task-sexp-p task-list))
+  (let ((last-before (before-tasks-pos domain)))
+    (append
+     (subseq domain 0 (1+ last-before))
+     (copy-list task-list)
+     (subseq domain (1+ last-before)))))
+
+(defsetf problem-goal (problem) (goal)
+  `(let ((*pddl-package* hddl-io::*hddl-package*))
+     (setf (pddl-utils:problem-goal ,problem) ,goal)))
+
+(defun problem-goal (problem)
+  (pddl-utils:problem-goal problem))
 
 (defun domain-methods (domain)
   (check-type domain domain)

@@ -38,7 +38,8 @@
   ;; this one is different in HDDL as is the SETF method for domain actions...
   (:shadow #:insert-domain-actions #:domain-actions
            #:make-domain #:make-problem
-           #:canonicalize-domain)
+           #:canonicalize-domain
+           #:problem-goal)
   (:reexport :pddl-utils :hddl-pprinter)
   (:import-from :pddl-utils
                 #:action-sexp-p
@@ -67,6 +68,7 @@
    #:remove-domain-methods
    #:insert-domain-method
    #:insert-domain-methods
+   #:problem-goal
    )
   #+nil(:export
    #:domain-merger
