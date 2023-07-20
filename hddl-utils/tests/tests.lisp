@@ -166,6 +166,27 @@
     (capacity truck_0 capacity_1)
     ))
 
+(cl::defparameter hddl-utils-tests::*expected-objects*
+  '(package_0
+    package_1
+    capacity_0
+    capacity_1
+    city_loc_0
+    city_loc_1
+    city_loc_2
+    truck_0))
+
+(cl::defparameter hddl-utils-tests::*expected-goal*
+  '(and (at package_0 city_loc_0)
+    (at package_1 city_loc_2)))
+
+(cl::defparameter hddl-utils-tests::*expected-po-goal*
+  '(and
+   (walked couple0 place2)
+   (walked couple1 place2)
+   (walked couple2 place2)
+   ))
+
 (cl:in-package :hddl-utils-tests)
 
 (test parse-problem
@@ -173,14 +194,7 @@
     (is-true problem)
     (is (null (problem-goal problem)))
     (is (alexandria:set-equal
-         'hddl::(package_0
-                 package_1
-                 capacity_0
-                 capacity_1
-                 city_loc_0
-                 city_loc_1
-                 city_loc_2
-                 truck_0)
+         *expected-objects*
          (remove-types-from-list (problem-objects problem))))
     (is-true (typep problem 'hddl:problem))
     (is (eq 'hddl::domain_htn (hddl-utils:problem-domain problem)))
@@ -191,8 +205,7 @@
 
 (test problem-goals-ordered
   (let ((problem (read-hddl-file (merge-pathnames "ipc2020-total-order-transport-p01.hddl" *tests-dir*)))
-        (goal-expr 'hddl:: (and (at package_0 city_loc_0)
-                                (at package_1 city_loc_2))))
+        (goal-expr *expected-goal*))
     (setf (hddl-utils:problem-goal problem) goal-expr)
     (is (equalp goal-expr (hddl-utils:problem-goal problem)))
     )
@@ -200,13 +213,8 @@
 
 (test problem-goals-partial-order
   (let ((problem (read-hddl-file (merge-pathnames "ipc2020-hiking-ordered-p01.hddl" *tests-dir*)))
-        (goal-expr 'hddl:: (and (at package_0 city_loc_0)
-                                (at package_1 city_loc_2))))
-    (is (equal 'hddl::(and
-                       (walked couple0 place2)
-                       (walked couple1 place2)
-                       (walked couple2 place2)
-                       )
+        (goal-expr *expected-goal*))
+    (is (equal *expected-po-goal*
                (hddl-utils:problem-goal problem)))
     (setf (hddl-utils:problem-goal problem) goal-expr)
     (is (equalp goal-expr (hddl-utils:problem-goal problem)))
