@@ -118,13 +118,12 @@ in the form of a list of actions."
                    (space-separated-string->hddl-list (subseq line pos))
                    (let ((components
                            (cl-ppcre:split "[ \\t]+" line :start (1+ pos))))
-                     (mapcar #'(lambda (x) (intern x *hddl-package*))
-                             components))))))))))
+                     (mapcar #'hddl-symbol components))))))))))
     ;; parse the roots
-    (when (equalp (subseq (string-left-trim (list #\space #\tab) (subseq root-line 4))
-                          0 5)
-                  "__top")
-      (error "Can't parse HDDL plans with special \"__top\" root task"))
+    (let ((root-suffix (string-left-trim (list #\space #\tab) (subseq root-line 4))))
+      (when (and (>= (length root-suffix) 5)
+                 (equalp (subseq root-suffix 0 5) "__top"))
+        (error "Can't parse HDDL plans with special \"__top\" root task")))
     (setf roots
           (read-integer-list (subseq root-line 4)))
 
@@ -140,7 +139,7 @@ in the form of a list of actions."
                 (collecting `(,id
                               ,(space-separated-string->hddl-list task-string)
                               .
-                              (,(intern method-id *hddl-package*)
+                              (,(intern (string-upcase method-id) *hddl-package*)
                                ,@(read-integer-list subtasks))))))))
     `(:hddl-plan
       :actions ,actions
@@ -241,7 +240,7 @@ in the form of a list of actions."
 ;;; tasks in a domain
 (set-pprint-dispatch '(cons (member :task))
                      #'(lambda (str obj)
-                         (if (complex-task-def-p obj)
+                         (if (complex-task-sexp-p obj)
                              (destructuring-bind (keyword task-name
                                                   param-keyword param-defs)
                                  obj
@@ -286,7 +285,7 @@ in the form of a list of actions."
                                                       (format str " - ~W~:_" type)
                                                       (when rest (format str " "))))))))))
                              (progn
-                               (warn "Ill-formed complex-task-def")
+                               (warn "Ill-formed complex task definition")
                                (print-object obj str))))
                      0
                      *hddl-pprint-dispatch*)
