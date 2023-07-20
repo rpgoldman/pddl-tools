@@ -2,6 +2,7 @@
 
 (defpackage :hddl-utils-tests
   (:use common-lisp hddl-utils fiveam)
+  (:import-from :alexandria #:set-equal)
   (:import-from :hddl-io #:partition-method-line
                 #:read-hddl-file
                 #:complex-task-sexp-p))
@@ -39,7 +40,10 @@
 
 (test parse-domain
   (let ((parsed (read-hddl-file (asdf:system-relative-pathname "hddl-utils" "hddl-utils/tests/transport-domain-partial-order-ipc2020.hddl"))))
-    (is-true parsed)))
+    (is-true parsed))
+  ;; can we parse a total order domain
+  (let ((parsed-domain (read-hddl-file (merge-pathnames "ipc2020-total-order-transport-domain.hddl" *tests-dir*))))
+    (is-true parsed-domain)))
 
 (test manipulate-domain-methods
   (let ((full-domain (read-hddl-file (asdf:system-relative-pathname "hddl-utils" "hddl-utils/tests/transport-domain-partial-order-ipc2020.hddl")))
@@ -146,3 +150,65 @@
                                                    :tasks (copy-list (domain-tasks full-domain)))))
       (setf (domain-tasks header-only-domain) (copy-list (domain-tasks full-domain)))
       (is (equalp expected-domain header-only-domain)))))
+
+(in-package :hddl)
+
+(cl:defparameter hddl-utils-tests::*expected-state*
+  '(
+    (capacity_predecessor capacity_0 capacity_1)
+    (road city_loc_0 city_loc_1)
+    (road city_loc_1 city_loc_0)
+    (road city_loc_1 city_loc_2)
+    (road city_loc_2 city_loc_1)
+    (at package_0 city_loc_1)
+    (at package_1 city_loc_1)
+    (at truck_0 city_loc_2)
+    (capacity truck_0 capacity_1)
+    ))
+
+(cl:in-package :hddl-utils-tests)
+
+(test parse-problem
+  (let ((problem (read-hddl-file (merge-pathnames "ipc2020-total-order-transport-p01.hddl" *tests-dir*))))
+    (is-true problem)
+    (is (null (problem-goal problem)))
+    (is (alexandria:set-equal
+         'hddl::(package_0
+                 package_1
+                 capacity_0
+                 capacity_1
+                 city_loc_0
+                 city_loc_1
+                 city_loc_2
+                 truck_0)
+         (remove-types-from-list (problem-objects problem))))
+    (is-true (typep problem 'hddl:problem))
+    (is (eq 'hddl::domain_htn (hddl-utils:problem-domain problem)))
+    (is (set-equal *expected-state*
+                   (hddl-utils:problem-state problem)
+                   :test #'equalp))
+    (is (null (hddl-utils:problem-goal problem)))))
+
+(test problem-goals-ordered
+  (let ((problem (read-hddl-file (merge-pathnames "ipc2020-total-order-transport-p01.hddl" *tests-dir*)))
+        (goal-expr 'hddl:: (and (at package_0 city_loc_0)
+                                (at package_1 city_loc_2))))
+    (setf (hddl-utils:problem-goal problem) goal-expr)
+    (is (equalp goal-expr (hddl-utils:problem-goal problem)))
+    )
+  )
+
+(test problem-goals-partial-order
+  (let ((problem (read-hddl-file (merge-pathnames "ipc2020-hiking-ordered-p01.hddl" *tests-dir*)))
+        (goal-expr 'hddl:: (and (at package_0 city_loc_0)
+                                (at package_1 city_loc_2))))
+    (is (equal 'hddl::(and
+                       (walked couple0 place2)
+                       (walked couple1 place2)
+                       (walked couple2 place2)
+                       )
+               (hddl-utils:problem-goal problem)))
+    (setf (hddl-utils:problem-goal problem) goal-expr)
+    (is (equalp goal-expr (hddl-utils:problem-goal problem)))
+    )
+  )
