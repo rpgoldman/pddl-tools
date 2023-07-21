@@ -98,7 +98,24 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
   `(:method ,method-name :parameters ,(copy-tree params)
      :task ,task-sexpr
      :precondition ,(copy-tree precond)
-     :ordered-subtasks ,(copy-tree tasks)))
+     :ordered-subtasks (and ,@(copy-tree tasks))))
+
+(defun method-subtasks (method)
+  (cond ((find :ordered-subtasks method)
+         (getf method :ordered-subtasks))
+        ((find method :sub-tasks)
+         (getf method :sub-tasks))
+        ((find method :tasks)
+         (getf method :tasks))
+        (t (error "Unable to find subtasks in method definition:~%~s" method))))
+
+(defsetf method-subtasks (method) (subtasks)
+  `(let ((subtasks (hddlify-tree ,subtasks)))
+     (cond ((getf ,method :ordered-subtasks nil)
+            (setf (getf ,method :ordered-subtasks) subtasks))
+           ((getf ,method :tasks nil)
+            (setf (getf ,method :tasks) subtasks))
+           (t (setf (getf ,method :sub-tasks) subtasks)))))
 
 (defun problem-htn (problem)
   (problem-element problem :htn))
@@ -186,6 +203,13 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
 (defun problem-goal (problem)
   (pddl-utils:problem-goal problem))
 
+(defsetf problem-state (problem) (state)
+  `(let ((*pddl-package* hddl-io::*hddl-package*))
+     (setf (pddl-utils:problem-state ,problem) ,state)))
+
+(defun problem-state (problem)
+  (pddl-utils:problem-state problem))
+
 (defun domain-methods (domain)
   (check-type domain domain)
   (remove-if-not #'(lambda (x) (eq x :method))
@@ -265,3 +289,10 @@ element to *remain*.
           (setf (cdr (last (nbutlast ,domain (- (length ,domain) action-tail)))) ,actions))
       ;; return something that fits with what SETF should return
       (domain-actions ,domain))))
+
+(defun domain-predicates (domain)
+  (pddl-utils:domain-predicates domain))
+
+(defsetf domain-predicates (domain) (new-pred-list)
+  `(let ((*pddl-package* *hddl-package*))
+     (setf (pddl-utils:domain-predicates ,domain) ,new-pred-list)))

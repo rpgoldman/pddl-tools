@@ -35,12 +35,14 @@
   (:documentation "Utilities for wrangling PDDL domain and problem files.")
   (:use :common-lisp :hddl :iterate :pddl-utils :hddl-pprinter)
   (:nicknames :hddl-utils)
-  ;; this one is different in HDDL as is the SETF method for domain actions...
   (:shadow #:insert-domain-actions #:domain-actions
+           #:domain-predicates
            #:make-domain #:make-problem
            #:canonicalize-domain
-           #:problem-goal)
+           #:problem-goal
+           #:problem-state)
   (:reexport :pddl-utils :hddl-pprinter)
+  (:import-from :alexandria #:if-let)
   (:import-from :pddl-utils
                 #:action-sexp-p
                 #:has-element-p
@@ -61,6 +63,7 @@
   (:export
    #:problem-htn
    #:domain-tasks
+   #:domain-predicates
    #:remove-domain-tasks
    #:insert-domain-task
    #:insert-domain-tasks
@@ -69,6 +72,9 @@
    #:insert-domain-method
    #:insert-domain-methods
    #:problem-goal
+   #:method-subtasks
+   #:task-name
+   #:task-parameters
    )
   #+nil(:export
    #:domain-merger
