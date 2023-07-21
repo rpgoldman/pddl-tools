@@ -141,21 +141,22 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
 
 
 ;;; misc utility
-(defun pddlify (sym)
-  (cond ((eq (symbol-package sym) (find-package *pddl-package*))
+(defun pddlify (sym &optional (package *pddl-package*))
+  (cond ((eq (symbol-package sym) (find-package package))
          sym)
         ((eq (symbol-package sym) (find-package :keyword))
          sym)
         (t
          (pddl-symbol sym))))
 
-(defun pddlify-tree (tree)
-  (cond ((null tree) nil)
-        ((symbolp tree)
-         (pddlify tree))
-        ((consp tree)
-         (cons (pddlify-tree (car tree)) (pddlify-tree (cdr tree))))
-        (t tree)))
+(defun pddlify-tree (tree &optional (package *pddl-package*))
+  (let ((*pddl-package* package))
+   (cond ((null tree) nil)
+         ((symbolp tree)
+          (pddlify tree))
+         ((consp tree)
+          (cons (pddlify-tree (car tree)) (pddlify-tree (cdr tree))))
+         (t tree))))
 
 
 (defun problem-domain (problem)
@@ -228,18 +229,18 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
 
 (defun domain-predicates (domain)
   (assert (domain-p domain))
-  (let ((head (find-if #'(lambda(e)
+  (let ((head (find-if #'(lambda (e)
                            (and (listp e) (eq (car e) ':predicates)))
                        domain)))
     (rest head)))
 
 (defsetf domain-predicates (domain) (new-pred-list)
   `(progn
-     (assert (domain-p domain))
+     (assert (domain-p ,domain))
      (setf 
-      (cdr (find :predicates (cddr domain) :key 'first))
+      (cdr (find :predicates (cddr ,domain) :key 'first))
       (pddlify-tree
-       (remove-duplicates 
+       (remove-duplicates
         (append (domain-predicates ,domain) ,new-pred-list))))))
 
 (defun domain-constants (domain)
