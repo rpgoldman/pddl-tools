@@ -34,6 +34,8 @@ FOO - TYPE1 BAR - TYPE1 BAZ - TYPE2
 instead of \"minimal form\" like
 FOO BAR - TYPE1 BAZ - TYPE2."
     (let ((*print-pprint-dispatch* *hddl-pprint-dispatch*)
+          (*print-case* :downcase)
+          (pddl-io::*pddl-package* *hddl-package*)
           (*package* (find-package *hddl-package*))
           (*canonical* canonical)
           *is-problem* *is-domain*)

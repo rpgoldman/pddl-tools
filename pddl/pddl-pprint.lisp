@@ -164,7 +164,8 @@ in the form of a list of actions."
 (set-pprint-dispatch '(cons (member :requirements))
                      #'(lambda (str obj)
                          (pprint-logical-block (str obj)
-                           (format str "(:REQUIREMENTS ~{~W~^ ~_~})"
+                           (format str "(~s ~{~W~^ ~_~})"
+                                   (first obj)
                                    (rest obj))))
                      0
                      *pddl-pprint-dispatch*)
