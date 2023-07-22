@@ -103,9 +103,9 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
 (defun method-subtasks (method)
   (cond ((find :ordered-subtasks method)
          (getf method :ordered-subtasks))
-        ((find method :sub-tasks)
+        ((find :sub-tasks method)
          (getf method :sub-tasks))
-        ((find method :tasks)
+        ((find :tasks method)
          (getf method :tasks))
         (t (error "Unable to find subtasks in method definition:~%~s" method))))
 
