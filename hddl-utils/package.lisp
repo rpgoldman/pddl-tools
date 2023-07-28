@@ -80,6 +80,9 @@
    #:task-parameters
    #:predicate-name
    #:predicate-parameters
+   #:hddl-plan-to-pddl-plan
+   #:hddl-domain-to-pddl-domain
+   #:hddl-problem-to-pddl-problem
    )
 )
 

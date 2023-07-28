@@ -323,3 +323,26 @@ element to *remain*.
 (defsetf domain-predicates (domain) (new-pred-list)
   `(let ((*pddl-package* *hddl-package*))
      (setf (pddl-utils:domain-predicates ,domain) ,new-pred-list)))
+
+(defun hddl-plan-to-pddl-plan (hddl-plan)
+  "Take the S-expression form of an HDDL plan and return a PDDL plan extracted from it."
+  (pddlify-tree
+   (mapcar #'cdr (getf hddl-plan :actions))))
+
+(defun hddl-domain-to-pddl-domain (hddl-domain)
+  (pddl-utils:make-domain (domain-name hddl-domain)
+                          :requirements (remove :hierarchy
+                                                (domain-requirements hddl-domain))
+                          :constants (domain-constants hddl-domain)
+                          :predicates (domain-predicates hddl-domain)
+                          :actions (domain-actions hddl-domain)
+                          :types (domain-types hddl-domain)))
+
+(defun hddl-problem-to-pddl-problem (hddl-problem)
+  (pddl-utils:make-problem (problem-name hddl-problem)
+                           :domain (problem-domain hddl-problem)
+                          :requirements (remove :hierarchy
+                                                (problem-requirements hddl-problem))
+                          :objects (problem-objects hddl-problem)
+                          :init (problem-state hddl-problem)
+                          :goal (problem-goal hddl-problem)))
