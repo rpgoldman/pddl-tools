@@ -65,8 +65,10 @@
    #:problem-objects
    #:problem-state
    #:problem-goal
+   #:problem-requirements
    #:domain-predicates
    #:domain-reqs
+   #:domain-requirements
    #:domain-types
    #:domain-functions
    #:domain-actions

@@ -184,6 +184,17 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
       (cdr (find :objects (cddr ,problem) :key 'first))
       (pddlify-tree ,objectslist))))
 
+(defun problem-requirements (problem)
+  (problem-element problem :requirements))
+
+(defsetf problem-requirements (problem) (requirementslist)
+  `(progn
+     (assert (problem-p ,problem))
+     (setf
+      (cdr (find :requirements (cddr ,problem) :key 'first))
+      (pddlify-tree ,requirementslist))))
+
+
 (defun problem-state (problem)
   (problem-element problem :init))
 
@@ -237,7 +248,7 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
 (defsetf domain-predicates (domain) (new-pred-list)
   `(progn
      (assert (domain-p ,domain))
-     (setf 
+     (setf
       (cdr (find :predicates (cddr ,domain) :key 'first))
       (pddlify-tree
        (remove-duplicates
@@ -258,7 +269,7 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
           (pddl-pprinter::minimize-canonical-type-list
            (canonicalize-types
             (pddlify-tree new-const-list)))))
-  (setf 
+  (setf
    (cdr (find :constants (cddr domain) :key 'first))
    new-const-list)))
 
@@ -284,9 +295,10 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
       (finally (setf (domain-constants domain)
                      (append old additions))))
     (domain-constants domain)))
-               
 
-    
+
+(defun domain-requirements (domain)
+  (domain-reqs domain))
 
 (defun domain-reqs (domain)
   (assert (domain-p domain))
@@ -341,7 +353,7 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
 ;;; Functions related to the components of a PDDL action.
 
 (defmacro defaction (name params precondition effect)
-  "An abbreviated version of MAKE-ACTION that allows you to 
+  "An abbreviated version of MAKE-ACTION that allows you to
 dispense with quotes and keyword arguments."
   `(make-action ',name ',params
                 :precondition ',precondition
@@ -366,7 +378,7 @@ dispense with quotes and keyword arguments."
       :condition ,condition
     :effect ,effect)))
 
-(defun action-effect (action)    
+(defun action-effect (action)
   (assert (action-p action))
   (second (member ':effect action)))
 
@@ -378,7 +390,7 @@ dispense with quotes and keyword arguments."
        (member :effect ,action))
       (pddlify-tree ,effect))))
 
-(defun action-precondition (action)    
+(defun action-precondition (action)
   (assert (action-p action))
   (second (member ':precondition action)))
 
@@ -390,7 +402,7 @@ dispense with quotes and keyword arguments."
        (member :precondition ,action))
       (pddlify-tree ,precond))))
 
-(defun action-params (action)    
+(defun action-params (action)
   (assert (action-p action))
   (second (member ':parameters action)))
 
@@ -402,7 +414,7 @@ dispense with quotes and keyword arguments."
        (member :parameters ,action))
       (pddlify-tree ,params))))
 
-(defun action-name (action)    
+(defun action-name (action)
   (assert (action-p action))
   (second action))
 
@@ -432,14 +444,14 @@ dispense with quotes and keyword arguments."
   `(let ((effect (action-effect ,action))
          cost-effect
          (cost-expr (list 'pddl::increase '(pddl::total-cost) ,cost)))
-    
+
      (unless effect
        (setf (action-effect ,action)
              (list 'and cost-expr)))
-     
+
      (unless (eql (first effect) 'and)
        (setf effect (list 'and effect)))
-     
+
      (setf cost-effect
            (find 'pddl::increase effect
                  :key #'(lambda (predicate)
@@ -448,12 +460,12 @@ dispense with quotes and keyword arguments."
                            (eql (first (second predicate))
                                 'pddl::total-cost)
                            (first predicate)))))
-     
+
      (if cost-effect
        (setf (third cost-effect) ,cost)
        (setf (action-effect ,action)
              (append effect (list cost-expr))))
-     
+
      ,cost))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -472,11 +484,11 @@ dispense with quotes and keyword arguments."
                                                      pddl-domain2))))
         (parent-type-table (make-hash-table :test #'eql))
         all-types new-typed-list)
-    
+
     (setf all-types (loop for type in typed-list
                           unless (eql type '-)
                             collect type))
-    (loop 
+    (loop
       with start = 0
       with lst = typed-list
       for pos = (position '- lst)
@@ -486,33 +498,33 @@ dispense with quotes and keyword arguments."
       when (null pos)
         do (error "Malformed typed list ~a. There are non-OBJECT types
                           without any parents." typed-list)
-      do (loop for type in subtypes 
+      do (loop for type in subtypes
                do (setf (gethash type parent-type-table)
                         (push (nth (1+ pos) lst)
                               (gethash type parent-type-table))))
       do (setf lst (subseq lst (+ pos 2))))
-    
+
     (loop for type in all-types
           when (and (not (eql type 'object))
                     (null (gethash type parent-type-table)))
             do (warn "The type ~a was not declared." type)
-          when (> (length (remove-duplicates 
+          when (> (length (remove-duplicates
                            (gethash type
                                     parent-type-table))) 1)
             do (error "The type ~a has two parent types in the input typed list ~a."
                       type typed-list)
-          when (= (length (remove-duplicates 
+          when (= (length (remove-duplicates
                            (gethash type
                                     parent-type-table))) 1)
             do (setf (gethash type parent-type-table)
-                     (remove-duplicates 
+                     (remove-duplicates
                       (gethash type
                                parent-type-table))))
-    
+
     ;; Now reconstruct...
     (maphash #'(lambda (type parent)
                  (setf new-typed-list
-                       (append new-typed-list 
+                       (append new-typed-list
                                `(,type - ,(first parent)))))
              parent-type-table)
     new-typed-list))
