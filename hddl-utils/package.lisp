@@ -73,88 +73,14 @@
    #:insert-domain-methods
    #:problem-goal
    #:method-subtasks
+   #:method-task
+   #:method-parameters
+   #:method-precondition
    #:task-name
    #:task-parameters
+   #:predicate-name
+   #:predicate-parameters
    )
-  #+nil(:export
-   #:domain-merger
-   #:problem-merger
-
-   ;; move stuff into the pddl package
-   #:pddlify
-   #:pddlify-tree
-
-   ;; generalized accessors
-   #:problem-element
-   #:domain-element
-
-   ;; specific accessors
-   #:domain-name
-   #:problem-name
-   #:problem-domain
-   #:problem-objects
-   #:problem-state
-   #:problem-goal
-   #:domain-predicates
-   #:domain-reqs
-   #:domain-types
-   #:domain-functions
-   #:domain-actions
-   #:domain-constants
-   #:action-precondition
-   #:action-effects
-   #:action-name
-   #:action-params
-
-   ;; translate s-expressions to objects
-   #:domain->object
-   #:problem->object
-
-   ;; makers
-   #:make-domain
-   #:make-problem
-   #:make-action
-   #:defaction
-   #:make-durative-action
-   #:copy-domain
-   #:copy-problem
-   #:canonicalize-domain
-
-   ;; miscellany
-   #:remove-domain-actions
-   #:insert-domain-actions
-   #:exists-same
-   #:add-to-domain-constants
-   #:remove-types-from-list
-   ;; simplifications
-   #:canonicalize-types
-   #:typelist-to-alist
-
-
-   ;; I/O
-   #:read-pddl-file
-   #:pprint-pddl
-   #:*pddl-pprint-dispatch-table*
-   #:*pddl-package*
-   #:print-pddl-plan-to-file
-   #:print-pddl-plan
-   #:read-pddl-plan
-   #:read-pddl-plan-file
-
-   ;; types
-   #:action
-   #:domain
-   #:problem
-
-   ;; constructor macros
-   #:with-problem
-   #:augmenting-problem
-   ;; internal macros
-   #:definstance
-   #:facts
-   ;; internal functions
-   #:make-inst
-   #:add-fact
-   ))
+)
 
 

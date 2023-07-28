@@ -93,6 +93,13 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
 (defun task-parameters (complex-task)
   (getf complex-task :parameters))
 
+(defun predicate-name (pred-def)
+  (first pred-def))
+
+(defun predicate-parameters (pred-def)
+  (rest pred-def))
+
+
 
 (defun make-ordered-method (method-name task-sexpr params &key precond tasks)
   `(:method ,method-name :parameters ,(copy-tree params)
@@ -116,6 +123,26 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
            ((getf ,method :tasks nil)
             (setf (getf ,method :tasks) subtasks))
            (t (setf (getf ,method :sub-tasks) subtasks)))))
+
+(defun method-task (method)
+  (getf method :task))
+
+(defsetf method-task (method) (task)
+  `(setf (getf ,method :task) ,task))
+
+
+(defun method-parameters (method)
+  (getf method :parameters))
+
+(defsetf method-parameters (method) (parameters)
+  `(setf (getf ,method :parameters) ,parameters))
+
+(defun method-precondition (method)
+  (getf method :precondition))
+
+(defsetf method-precondition (method) (precondition)
+  `(setf (getf ,method :precondition) ,precondition))
+
 
 (defun problem-htn (problem)
   (problem-element problem :htn))
