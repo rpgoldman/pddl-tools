@@ -605,7 +605,8 @@ make it a single-layer conjunction (intermediate AND's removed)."
                 (if (positive-literal-p (second conj))
                     conj
                     (error "Cannot handle negations other than negated literals in flatten-conjunction: ~s"
-                           conj))))))
+                           conj)))
+               (otherwise (list conj)))))
     (if (eq (first conj) 'and)
         `(and ,@ (flatten-1 conj))
         (flatten-1 conj))))
