@@ -1,0 +1,1231 @@
+ 
+
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "actions": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "effect": {
+              "type": "object",
+              "properties": {
+                "effects": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "op": {
+                          "type": "string"
+                        },
+                        "operand": {
+                          "type": "object",
+                          "properties": {
+                            "args": {
+                              "type": "array",
+                              "items": [
+                                {
+                                  "type": "string"
+                                }
+                              ]
+                            },
+                            "predicate": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "args",
+                            "predicate"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "op",
+                        "operand"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "args": {
+                          "type": "array",
+                          "items": [
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "predicate": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "args",
+                        "predicate"
+                      ]
+                    }
+                  ]
+                },
+                "op": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "effects",
+                "op"
+              ]
+            },
+            "name": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                }
+              ]
+            },
+            "precondition": {
+              "type": "object",
+              "properties": {
+                "op": {
+                  "type": "string"
+                },
+                "operands": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "args": {
+                          "type": "array",
+                          "items": [
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "predicate": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "args",
+                        "predicate"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "op": {
+                          "type": "string"
+                        },
+                        "operand": {
+                          "type": "object",
+                          "properties": {
+                            "args": {
+                              "type": "array",
+                              "items": [
+                                {
+                                  "type": "string"
+                                }
+                              ]
+                            },
+                            "predicate": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "args",
+                            "predicate"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "op",
+                        "operand"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "args": {
+                          "type": "array",
+                          "items": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "predicate": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "args",
+                        "predicate"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "op",
+                "operands"
+              ]
+            }
+          },
+          "required": [
+            "effect",
+            "name",
+            "parameters",
+            "precondition"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "effect": {
+              "type": "object",
+              "properties": {
+                "effects": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "op": {
+                          "type": "string"
+                        },
+                        "operand": {
+                          "type": "object",
+                          "properties": {
+                            "args": {
+                              "type": "array",
+                              "items": [
+                                {
+                                  "type": "string"
+                                }
+                              ]
+                            },
+                            "predicate": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "args",
+                            "predicate"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "op",
+                        "operand"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "args": {
+                          "type": "array",
+                          "items": [
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "predicate": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "args",
+                        "predicate"
+                      ]
+                    }
+                  ]
+                },
+                "op": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "effects",
+                "op"
+              ]
+            },
+            "name": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                }
+              ]
+            },
+            "precondition": {
+              "type": "object",
+              "properties": {
+                "op": {
+                  "type": "string"
+                },
+                "operands": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "args": {
+                          "type": "array",
+                          "items": [
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "predicate": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "args",
+                        "predicate"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "args": {
+                          "type": "array",
+                          "items": [
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "predicate": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "args",
+                        "predicate"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "args": {
+                          "type": "array",
+                          "items": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "predicate": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "args",
+                        "predicate"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "op",
+                "operands"
+              ]
+            }
+          },
+          "required": [
+            "effect",
+            "name",
+            "parameters",
+            "precondition"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "effect": {
+              "type": "null"
+            },
+            "name": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                }
+              ]
+            },
+            "precondition": {
+              "type": "object",
+              "properties": {
+                "op": {
+                  "type": "string"
+                },
+                "operands": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "args": {
+                          "type": "array",
+                          "items": [
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "predicate": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "args",
+                        "predicate"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "args": {
+                          "type": "array",
+                          "items": [
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "predicate": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "args",
+                        "predicate"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "op",
+                "operands"
+              ]
+            }
+          },
+          "required": [
+            "effect",
+            "name",
+            "parameters",
+            "precondition"
+          ]
+        }
+      ]
+    },
+    "constants": {
+      "type": "array",
+      "items": {}
+    },
+    "methods": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                }
+              ]
+            },
+            "precondition": {
+              "type": "null"
+            },
+            "task": {
+              "type": "object",
+              "properties": {
+                "args": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "predicate": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "args",
+                "predicate"
+              ]
+            },
+            "taskNetwork": {
+              "type": "object",
+              "properties": {
+                "orderedSubtasks": {
+                  "type": "array",
+                  "items": {}
+                }
+              },
+              "required": [
+                "orderedSubtasks"
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "parameters",
+            "precondition",
+            "task",
+            "taskNetwork"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                }
+              ]
+            },
+            "precondition": {
+              "type": "null"
+            },
+            "task": {
+              "type": "object",
+              "properties": {
+                "args": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "predicate": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "args",
+                "predicate"
+              ]
+            },
+            "taskNetwork": {
+              "type": "object",
+              "properties": {
+                "orderedSubtasks": {
+                  "type": "array",
+                  "items": {}
+                }
+              },
+              "required": [
+                "orderedSubtasks"
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "parameters",
+            "precondition",
+            "task",
+            "taskNetwork"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                }
+              ]
+            },
+            "precondition": {
+              "type": "null"
+            },
+            "task": {
+              "type": "object",
+              "properties": {
+                "args": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "predicate": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "args",
+                "predicate"
+              ]
+            },
+            "taskNetwork": {
+              "type": "object",
+              "properties": {
+                "orderedSubtasks": {
+                  "type": "array",
+                  "items": {}
+                }
+              },
+              "required": [
+                "orderedSubtasks"
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "parameters",
+            "precondition",
+            "task",
+            "taskNetwork"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                }
+              ]
+            },
+            "precondition": {
+              "type": "null"
+            },
+            "task": {
+              "type": "object",
+              "properties": {
+                "args": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "predicate": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "args",
+                "predicate"
+              ]
+            },
+            "taskNetwork": {
+              "type": "object",
+              "properties": {
+                "orderedSubtasks": {
+                  "type": "array",
+                  "items": {}
+                }
+              },
+              "required": [
+                "orderedSubtasks"
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "parameters",
+            "precondition",
+            "task",
+            "taskNetwork"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                }
+              ]
+            },
+            "precondition": {
+              "type": "null"
+            },
+            "task": {
+              "type": "object",
+              "properties": {
+                "args": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "predicate": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "args",
+                "predicate"
+              ]
+            },
+            "taskNetwork": {
+              "type": "object",
+              "properties": {
+                "orderedSubtasks": {
+                  "type": "array",
+                  "items": {}
+                }
+              },
+              "required": [
+                "orderedSubtasks"
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "parameters",
+            "precondition",
+            "task",
+            "taskNetwork"
+          ]
+        }
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "predicates": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "parameters"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "parameters"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "parameters"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "parameters"
+          ]
+        }
+      ]
+    },
+    "requirements": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "tasks": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "parameters"
+          ]
+        }
+      ]
+    },
+    "types": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "supertype": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "supertype",
+            "type"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "$schema",
+    "actions",
+    "constants",
+    "methods",
+    "name",
+    "predicates",
+    "requirements",
+    "tasks",
+    "types"
+  ]
+}
+
