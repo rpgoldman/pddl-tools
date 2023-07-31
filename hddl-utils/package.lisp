@@ -72,10 +72,16 @@
    #:insert-domain-method
    #:insert-domain-methods
    #:problem-goal
+   #:ordered-method-p
+   #:method-def ;type
+   #:ordered-method-def                 ;type
+   #:method-name
+   #:method-task-net
    #:method-subtasks
    #:method-task
    #:method-parameters
    #:method-precondition
+   #:task-def ; type
    #:task-name
    #:task-parameters
    #:predicate-name

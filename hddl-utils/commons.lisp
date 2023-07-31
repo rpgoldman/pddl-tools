@@ -100,6 +100,31 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
   (rest pred-def))
 
 
+;;;---------------------------------------------------------------------------
+;;; Types
+;;;---------------------------------------------------------------------------
+
+(defun method-p (sexp)
+  (eq (first sexp) :method))
+
+(deftype method-def ()
+  '(satisfies method-p))
+
+(defun ordered-method-p (method)
+  (and (typep method 'method-def)
+   (or (find :ordered-subtasks (cddr method))
+       (find :ordered-tasks (cddr method)))))
+
+(deftype ordered-method-def ()
+  '(satisfies ordered-method-p))
+
+
+(defun task-p (sexp)
+  (eq (first sexp) :task))
+
+(deftype task-def ()
+  '(satisfies task-p)])
+
 
 (defun make-ordered-method (method-name task-sexpr params &key precond tasks)
   `(:method ,method-name :parameters ,(copy-tree params)
@@ -130,6 +155,16 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
 (defsetf method-task (method) (task)
   `(setf (getf ,method :task) ,task))
 
+(defun method-name (method)
+  (second method))
+
+(defsetf method-name (method) (task)
+  `(setf (second ,method) ,task))
+
+(defun method-task-net (method)
+  (if (ordered-method-p method)
+      (method-subtasks method)
+      (error "Do not yet support partially-ordered task networks.")))
 
 (defun method-parameters (method)
   (getf method :parameters))
