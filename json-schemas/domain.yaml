@@ -1,594 +1,65 @@
-$schema: http://json-schema.org/draft-04/schema#
+$schema: http://json-schema.org/draft-07/schema#
 type: object
 properties:
   $schema:
     type: string
+    format: uri
+    const: https://www.sift.net/hddl/draft/2023-07-31/domain
+  name:
+    type: string
   actions:
     type: array
     items:
-      - type: object
-        properties:
-          effect:
-            type: object
-            properties:
-              effects:
-                type: array
-                items:
-                  - type: object
-                    properties:
-                      op:
-                        type: string
-                      operand:
-                        type: object
-                        properties:
-                          args:
-                            type: array
-                            items:
-                              - type: string
-                          predicate:
-                            type: string
-                        required:
-                          - args
-                          - predicate
-                    required:
-                      - op
-                      - operand
-                  - type: object
-                    properties:
-                      args:
-                        type: array
-                        items:
-                          - type: string
-                      predicate:
-                        type: string
-                    required:
-                      - args
-                      - predicate
-              op:
-                type: string
-            required:
-              - effects
-              - op
-          name:
-            type: string
-          parameters:
-            type: array
-            items:
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-          precondition:
-            type: object
-            properties:
-              op:
-                type: string
-              operands:
-                type: array
-                items:
-                  - type: object
-                    properties:
-                      args:
-                        type: array
-                        items:
-                          - type: string
-                      predicate:
-                        type: string
-                    required:
-                      - args
-                      - predicate
-                  - type: object
-                    properties:
-                      op:
-                        type: string
-                      operand:
-                        type: object
-                        properties:
-                          args:
-                            type: array
-                            items:
-                              - type: string
-                          predicate:
-                            type: string
-                        required:
-                          - args
-                          - predicate
-                    required:
-                      - op
-                      - operand
-                  - type: object
-                    properties:
-                      args:
-                        type: array
-                        items:
-                          - type: string
-                          - type: string
-                      predicate:
-                        type: string
-                    required:
-                      - args
-                      - predicate
-            required:
-              - op
-              - operands
-        required:
-          - effect
-          - name
-          - parameters
-          - precondition
-      - type: object
-        properties:
-          effect:
-            type: object
-            properties:
-              effects:
-                type: array
-                items:
-                  - type: object
-                    properties:
-                      op:
-                        type: string
-                      operand:
-                        type: object
-                        properties:
-                          args:
-                            type: array
-                            items:
-                              - type: string
-                          predicate:
-                            type: string
-                        required:
-                          - args
-                          - predicate
-                    required:
-                      - op
-                      - operand
-                  - type: object
-                    properties:
-                      args:
-                        type: array
-                        items:
-                          - type: string
-                      predicate:
-                        type: string
-                    required:
-                      - args
-                      - predicate
-              op:
-                type: string
-            required:
-              - effects
-              - op
-          name:
-            type: string
-          parameters:
-            type: array
-            items:
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-          precondition:
-            type: object
-            properties:
-              op:
-                type: string
-              operands:
-                type: array
-                items:
-                  - type: object
-                    properties:
-                      args:
-                        type: array
-                        items:
-                          - type: string
-                      predicate:
-                        type: string
-                    required:
-                      - args
-                      - predicate
-                  - type: object
-                    properties:
-                      args:
-                        type: array
-                        items:
-                          - type: string
-                      predicate:
-                        type: string
-                    required:
-                      - args
-                      - predicate
-                  - type: object
-                    properties:
-                      args:
-                        type: array
-                        items:
-                          - type: string
-                          - type: string
-                      predicate:
-                        type: string
-                    required:
-                      - args
-                      - predicate
-            required:
-              - op
-              - operands
-        required:
-          - effect
-          - name
-          - parameters
-          - precondition
-      - type: object
-        properties:
-          effect:
-            type: "null"
-          name:
-            type: string
-          parameters:
-            type: array
-            items:
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-          precondition:
-            type: object
-            properties:
-              op:
-                type: string
-              operands:
-                type: array
-                items:
-                  - type: object
-                    properties:
-                      args:
-                        type: array
-                        items:
-                          - type: string
-                      predicate:
-                        type: string
-                    required:
-                      - args
-                      - predicate
-                  - type: object
-                    properties:
-                      args:
-                        type: array
-                        items:
-                          - type: string
-                      predicate:
-                        type: string
-                    required:
-                      - args
-                      - predicate
-            required:
-              - op
-              - operands
-        required:
-          - effect
-          - name
-          - parameters
-          - precondition
+      $ref: $def/action
   constants:
     type: array
-    items: {}
+    items:
+      type:
+        $ref: $def/typelist
   methods:
     type: array
     items:
-      - type: object
-        properties:
-          name:
-            type: string
-          parameters:
-            type: array
-            items:
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-          precondition:
-            type: "null"
-          task:
-            type: object
-            properties:
-              args:
-                type: array
-                items:
-                  - type: string
-                  - type: string
-              predicate:
-                type: string
-            required:
-              - args
-              - predicate
-          taskNetwork:
-            type: object
-            properties:
-              orderedSubtasks:
-                type: array
-                items: {}
-            required:
-              - orderedSubtasks
-        required:
-          - name
-          - parameters
-          - precondition
-          - task
-          - taskNetwork
-      - type: object
-        properties:
-          name:
-            type: string
-          parameters:
-            type: array
-            items:
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-          precondition:
-            type: "null"
-          task:
-            type: object
-            properties:
-              args:
-                type: array
-                items:
-                  - type: string
-                  - type: string
-              predicate:
-                type: string
-            required:
-              - args
-              - predicate
-          taskNetwork:
-            type: object
-            properties:
-              orderedSubtasks:
-                type: array
-                items: {}
-            required:
-              - orderedSubtasks
-        required:
-          - name
-          - parameters
-          - precondition
-          - task
-          - taskNetwork
-      - type: object
-        properties:
-          name:
-            type: string
-          parameters:
-            type: array
-            items:
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-          precondition:
-            type: "null"
-          task:
-            type: object
-            properties:
-              args:
-                type: array
-                items:
-                  - type: string
-                  - type: string
-              predicate:
-                type: string
-            required:
-              - args
-              - predicate
-          taskNetwork:
-            type: object
-            properties:
-              orderedSubtasks:
-                type: array
-                items: {}
-            required:
-              - orderedSubtasks
-        required:
-          - name
-          - parameters
-          - precondition
-          - task
-          - taskNetwork
-      - type: object
-        properties:
-          name:
-            type: string
-          parameters:
-            type: array
-            items:
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-          precondition:
-            type: "null"
-          task:
-            type: object
-            properties:
-              args:
-                type: array
-                items:
-                  - type: string
-                  - type: string
-              predicate:
-                type: string
-            required:
-              - args
-              - predicate
-          taskNetwork:
-            type: object
-            properties:
-              orderedSubtasks:
-                type: array
-                items: {}
-            required:
-              - orderedSubtasks
-        required:
-          - name
-          - parameters
-          - precondition
-          - task
-          - taskNetwork
-      - type: object
-        properties:
-          name:
-            type: string
-          parameters:
-            type: array
-            items:
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-          precondition:
-            type: "null"
-          task:
-            type: object
-            properties:
-              args:
-                type: array
-                items:
-                  - type: string
-                  - type: string
-              predicate:
-                type: string
-            required:
-              - args
-              - predicate
-          taskNetwork:
-            type: object
-            properties:
-              orderedSubtasks:
-                type: array
-                items: {}
-            required:
-              - orderedSubtasks
-        required:
-          - name
-          - parameters
-          - precondition
-          - task
-          - taskNetwork
-  name:
-    type: string
+      - type:
+          $ref: $def/method
+  orderedSubtasks:
+    type: array
+    items:
+      type:
+        $ref: $def/task
+  method:
+    type: object
+    properties:
+      name:
+        type: string
+        parameters:
+          type: array
+          items:
+            type:
+              $ref: $def/typelist
+      precondition:
+        type:
+          $ref: $def/goal
+      task:
+        type:
+          $ref: $def/task
+     orderedTaskNetwork:
+       type: object
+       properties:
+         orderedSubtasks:
+           type: array
+           items:
+             type:
+               $ref: $def/task
+     taskNetwork:
+       type:
+         oneOf:
+           - orderedTaskNetwork
+    required:
+      - name
+      - parameters
+      - precondition
+      - task
+      - taskNetwork
   predicates:
     type: array
     items:
@@ -597,83 +68,8 @@ properties:
           name:
             type: string
           parameters:
-            type: array
-            items:
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-        required:
-          - name
-          - parameters
-      - type: object
-        properties:
-          name:
-            type: string
-          parameters:
-            type: array
-            items:
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-        required:
-          - name
-          - parameters
-      - type: object
-        properties:
-          name:
-            type: string
-          parameters:
-            type: array
-            items:
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-        required:
-          - name
-          - parameters
-      - type: object
-        properties:
-          name:
-            type: string
-          parameters:
-            type: array
-            items:
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
+            type:
+              $ref: $defs/typelist
         required:
           - name
           - parameters
@@ -681,36 +77,16 @@ properties:
     type: array
     items:
       - type: string
-      - type: string
-      - type: string
   tasks:
     type: array
     items:
-      - type: object
+      type: object
         properties:
           name:
             type: string
           parameters:
-            type: array
-            items:
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
-              - type: object
-                properties:
-                  name:
-                    type: string
-                  type:
-                    type: string
-                required:
-                  - name
-                  - type
+            type:
+              $ref: $defs/typelist
         required:
           - name
           - parameters
@@ -723,9 +99,196 @@ properties:
             type: string
           type:
             type: string
+        required: type
+  $def:
+    effect:
+      type: object
+      oneOf:
+        - null
+        - $ref: $def/atomicTerm
+        - $ref: $def/negatedEffect
+        - $ref: $def/condEffect
+        - $ref: $def/quantifiedEffect
+        - $ref: $def/conjEffect
+    typelist:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+          type:
+            type: string
+        required: name
+    conjEffect:
+      type: object
+      properties:
+        op:
+          type: string
+          const: and
+        effects:
+          type: array
+          items:
+            type:
+              $ref: $def/effect
+      required: [op, effect]
+    negatedEffect:
+      type: object
+      properties:
+        op:
+          type: string
+          const: not
+        effect:
+          type:
+            $ref: $def/effect
+      required: [op, effect]
+    condEffect:
+      type: object
+      properties:
+        op:
+          type: string
+          const: when
+        condition:
+          type:
+            $ref: $def/goal
+        effect:
+          type:
+            $ref: $def/effect
+      required: [op, condition, effect]
+    quantifiedEffect:
+      type: object
+      properties:
+        op:
+          type: string
+          oneof:
+            - const: forall
+            - const: exists
+        boundVars:
+          type:
+            $ref: $def/typelist
+        effect:
+          type:
+            $ref: $def/effect
+    atomicTerm:
+      type: object
+      properties:
+        predicate:
+          type: string
+        args:
+          type: array
+          items:
+            type: string
+      required:
+        - predicate
+        - args
+    goal:
+      oneof:
+        - $ref: $def/atomicTerm
+        - null
+        - $ref: $def/negatedGoal
+        - $ref: $def/naryOpGoal
+        - $ref: $def/binaryOpGoal
+        - $ref: $def/quantifiedGoal
+    negatedGoal:
+      type: object
+      properties:
+        op:
+          type: string
+          const: not
+        operand:
+          type:
+            $ref: $def/goal
+    binaryOpGoal:
+      type: object
+      properties:
+        op:
+          type: string
+          oneOf:
+            - const: imply
+        operand1:
+          type:
+            $ref: $def/goal
+        operand2:
+          type:
+            $ref: $def/goal
+      required: [op, operand1, operand2]
+    naryOpGoal:
+      type: object
+      properties:
+        op:
+          type: string
+          oneOf:
+            - const: and
+            - const: or
+        operands:
+          type: array
+          items:
+            $ref: $def/goal
+      required: [op, operands]
+    quantifiedGoal:
+      type: object
+      properties:
+        op:
+          type: string
+          oneof:
+            - const: forall
+            - const: exists
+        boundVars:
+          type:
+            $ref: $def/typelist
+        effect:
+          type:
+            $ref: $def/goal
+    
+
+
+    action:
+        type: object
+        properties:
+          effect:
+            type: $def/effect
+          name:
+            type: string
+          parameters:
+            type:
+              $ref: $def/typelist
+          precondition:
+            type:
+              $ref: $def/goal
         required:
-          - supertype
-          - type
+          - effect
+          - name
+          - parameters
+          - precondition
+
+    task:
+      type: object
+      properties:
+        args:
+          type: array
+              items:
+                - type: string
+                - type: string
+        predicate:
+          type: string
+     required:
+        - args
+        - predicate
+
+    taskDef:
+      type: object
+      properties:
+        args:
+          type:
+            $ref: $def/typelist
+        predicate:
+          type: string
+     required:
+        - args
+        - predicate
+
+
+    
 required:
   - $schema
   - actions
