@@ -1,0 +1,146 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+properties:
+  $schema:
+    type: string
+    format: uri
+    const: https://www.sift.net/hddl/draft/2023-08-01/problem
+  name:
+    type: string
+  domain:
+    type: string
+  objects:
+    type:
+      $ref: $defs/typelist
+  goal:
+    type:
+      $ref: $defs/goal
+  requirements:
+    type: array
+    items:
+      - type: string
+  init:
+    type: array
+    items:
+      type:
+        $ref: $defs/goal
+  htn:
+    type:
+      $ref: $defs/problemHTN
+required:
+  - $schema
+  - name
+  - init
+  - htn
+  $defs:
+    typelist:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+          type:
+            type: string
+        required: name
+      title: Typed list
+      description: >
+        A list of objects, each of which associates a name with
+        a type. Typing is optional in PDDL/HDDL, so the type
+        property is optional.        
+    atomicTerm:
+      type: object
+      properties:
+        predicate:
+          type: string
+        args:
+          type: array
+          items:
+            type: string
+      required:
+        - predicate
+        - args
+    goal:
+      oneof:
+        - $ref: $defs/atomicTerm
+        - null
+        - $ref: $defs/negatedGoal
+        - $ref: $defs/naryOpGoal
+        - $ref: $defs/binaryOpGoal
+        - $ref: $defs/quantifiedGoal
+    negatedGoal:
+      type: object
+      properties:
+        op:
+          type: string
+          const: not
+        operand:
+          type:
+            $ref: $defs/goal
+    binaryOpGoal:
+      type: object
+      properties:
+        op:
+          type: string
+          oneOf:
+            - const: imply
+        operand1:
+          type:
+            $ref: $defs/goal
+        operand2:
+          type:
+            $ref: $defs/goal
+      required: [op, operand1, operand2]
+    naryOpGoal:
+      type: object
+      properties:
+        op:
+          type: string
+          oneOf:
+            - const: and
+            - const: or
+        operands:
+          type: array
+          items:
+            $ref: $defs/goal
+      required: [op, operands]
+    quantifiedGoal:
+      type: object
+      properties:
+        op:
+          type: string
+          oneof:
+            - const: forall
+            - const: exists
+        boundVars:
+          type:
+            $ref: $defs/typelist
+        effect:
+          type:
+            $ref: $defs/goal
+
+    task:
+      type: object
+      properties:
+        args:
+          type: array
+              items:
+                type: string
+        taskName:
+          type: string
+     required:
+        - args
+        - taskName
+
+    problemHTN:
+      type: object
+      properties:
+        parameters:
+          type:
+            $ref: $defs/typedList
+        orderedSubtasks:
+          type: array
+          items:
+            type:
+              $ref: $defs/task
+

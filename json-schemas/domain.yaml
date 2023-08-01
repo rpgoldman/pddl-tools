@@ -19,45 +19,6 @@ properties:
     items:
       - type:
           $ref: $defs/method
-  orderedSubtasks:
-    type: array
-    items:
-      type:
-        $ref: $defs/task
-  method:
-    type: object
-    properties:
-      name:
-        type: string
-        parameters:
-          type: array
-          items:
-            type:
-              $ref: $defs/typelist
-      precondition:
-        type:
-          $ref: $defs/goal
-      task:
-        type:
-          $ref: $defs/task
-     orderedTaskNetwork:
-       type: object
-       properties:
-         orderedSubtasks:
-           type: array
-           items:
-             type:
-               $ref: $defs/task
-     taskNetwork:
-       type:
-         oneOf:
-           - orderedTaskNetwork
-    required:
-      - name
-      - parameters
-      - precondition
-      - task
-      - taskNetwork
   predicates:
     type: array
     items:
@@ -288,6 +249,43 @@ properties:
      required:
         - args
         - taskName
+
+  method:
+    type: object
+    properties:
+      name:
+        type: string
+    parameters:
+      type: array
+      items:
+        type:
+          $ref: $defs/typelist
+    precondition:
+      type:
+        $ref: $defs/goal
+    task:
+      type:
+        $ref: $defs/task
+     taskNetwork:
+       type:
+         oneOf:
+           - $ref: $defs/orderedTaskNetwork
+    required:
+      - name
+      - parameters
+      - precondition
+      - task
+      - taskNetwork
+
+  orderedTaskNetwork:
+    type: object
+    properties:
+      orderedSubtasks:
+        type: array
+        items:
+          type:
+            $ref: $defs/task
+
 
 
     
