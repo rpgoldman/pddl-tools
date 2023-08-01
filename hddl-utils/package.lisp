@@ -84,6 +84,9 @@
    #:task-def ; type
    #:task-name
    #:task-parameters
+   #:p-htn ; type -- problem HTN
+   #:p-htn-parameters
+   #:p-htn-ordered-subtasks
    #:predicate-name
    #:predicate-parameters
    #:hddl-plan-to-pddl-plan

@@ -112,8 +112,10 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
 
 (defun ordered-method-p (method)
   (and (typep method 'method-def)
-   (or (find :ordered-subtasks (cddr method))
-       (find :ordered-tasks (cddr method)))))
+       ;; the first element of METHOD should be :METHOD and the
+       ;; second the method-name, so we start looking at the CDDR.
+       (or (find :ordered-subtasks (cddr method))
+           (find :ordered-tasks (cddr method)))))
 
 (deftype ordered-method-def ()
   '(satisfies ordered-method-p))
@@ -123,7 +125,7 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
   (eq (first sexp) :task))
 
 (deftype task-def ()
-  '(satisfies task-p)])
+  '(satisfies task-p))
 
 
 (defun make-ordered-method (method-name task-sexpr params &key precond tasks)
@@ -186,6 +188,39 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
   (check-type domain domain)
   (remove-if-not #'(lambda (x) (eq x :task))
                  (cddr domain) :key 'first))
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+ (defparameter +ordered-subtask-keywords+
+   '(:ordered-subtasks :ordered-tasks))
+
+ (defparameter +subtask-keywords+
+   (append +ordered-subtask-keywords+
+           '(:subtasks :tasks))))
+
+(defun ordered-task-net-p (task-net)
+  (and (listp task-net)
+       (some #'(lambda (key) (find key task-net)) +ordered-subtask-keywords+)))
+
+(defun p-htn-p (x)
+  "Is the s-expression X a P-HTN (problem-htn)?"
+  (and (listp x)
+       (some #'(lambda (key) (find key x)) +subtask-keywords+)))
+
+(deftype p-htn ()
+  '(satisfies p-htn-p))
+
+(defun p-htn-parameters (htn)
+  (getf htn :parameters))
+
+(defun p-htn-ordered-subtasks (htn)
+  (or
+   (iter (for key in +ordered-subtask-keywords+)
+     (alexandria:when-let ((subtasks
+                            (getf htn key)))
+       (return subtasks))
+     (finally (return nil)))
+   (error "No ordered subtasks found in HTN: ~s" htn)))
+
 
 ;;; helper function
 ;;; allows us to match a tag against x as the first component,
