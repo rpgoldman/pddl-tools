@@ -36,9 +36,12 @@
            (asdf:*compile-file-warnings-behaviour* :error))
        (ql:quickload ,name :silent nil :verbose t))))
 
-;;; this is done outside the bounds of BUILD-SYSTEM below, because
-;;; CL-PPCRE doesn't build clean (at least on SBCL).
+;;; these are done outside the bounds of BUILD-SYSTEM below, because
+;;; CL-PPCRE doesn't build clean (at least on SBCL) and CL-JSON does not
+;;; build clean on Allegro
 (ql:quickload "cl-ppcre")
+(ql:quickload "cl-json")
+
 
 (build-system "pddl-utils")
 (build-system "hddl-utils")
