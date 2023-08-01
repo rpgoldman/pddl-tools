@@ -42,9 +42,11 @@
 
 (build-system "pddl-utils")
 (build-system "hddl-utils")
+(build-system "hddl-to-json")
 
 (ql:quickload "pddl-utils/tests")
 (ql:quickload "hddl-utils/tests")
+(ql:quickload "hddl-to-json/tests")
 
 (defmacro test-system (name)
   `(handler-case
@@ -54,5 +56,6 @@
 
 (test-system "pddl-utils")
 (test-system "hddl-utils")
+(test-system "hddl-to-json")
 
 (uiop:quit 0)
