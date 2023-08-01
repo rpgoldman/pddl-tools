@@ -10,22 +10,20 @@ properties:
   actions:
     type: array
     items:
-      $ref: $def/action
+      $ref: $defs/action
   constants:
-    type: array
-    items:
-      type:
-        $ref: $def/typelist
+    type:
+      $ref: $defs/typelist
   methods:
     type: array
     items:
       - type:
-          $ref: $def/method
+          $ref: $defs/method
   orderedSubtasks:
     type: array
     items:
       type:
-        $ref: $def/task
+        $ref: $defs/task
   method:
     type: object
     properties:
@@ -35,13 +33,13 @@ properties:
           type: array
           items:
             type:
-              $ref: $def/typelist
+              $ref: $defs/typelist
       precondition:
         type:
-          $ref: $def/goal
+          $ref: $defs/goal
       task:
         type:
-          $ref: $def/task
+          $ref: $defs/task
      orderedTaskNetwork:
        type: object
        properties:
@@ -49,7 +47,7 @@ properties:
            type: array
            items:
              type:
-               $ref: $def/task
+               $ref: $defs/task
      taskNetwork:
        type:
          oneOf:
@@ -69,7 +67,7 @@ properties:
             type: string
           parameters:
             type:
-              $ref: $defs/typelist
+              $ref: $defss/typelist
         required:
           - name
           - parameters
@@ -86,7 +84,7 @@ properties:
             type: string
           parameters:
             type:
-              $ref: $defs/typelist
+              $ref: $defss/typelist
         required:
           - name
           - parameters
@@ -100,16 +98,16 @@ properties:
           type:
             type: string
         required: type
-  $def:
+  $defs:
     effect:
       type: object
       oneOf:
         - null
-        - $ref: $def/atomicTerm
-        - $ref: $def/negatedEffect
-        - $ref: $def/condEffect
-        - $ref: $def/quantifiedEffect
-        - $ref: $def/conjEffect
+        - $ref: $defs/atomicTerm
+        - $ref: $defs/negatedEffect
+        - $ref: $defs/condEffect
+        - $ref: $defs/quantifiedEffect
+        - $ref: $defs/conjEffect
     typelist:
       type: array
       items:
@@ -120,6 +118,11 @@ properties:
           type:
             type: string
         required: name
+      title: Typed list
+      description: >
+        A list of objects, each of which associates a name with
+        a type. Typing is optional in PDDL/HDDL, so the type
+        property is optional.        
     conjEffect:
       type: object
       properties:
@@ -130,7 +133,7 @@ properties:
           type: array
           items:
             type:
-              $ref: $def/effect
+              $ref: $defs/effect
       required: [op, effect]
     negatedEffect:
       type: object
@@ -140,7 +143,7 @@ properties:
           const: not
         effect:
           type:
-            $ref: $def/effect
+            $ref: $defs/effect
       required: [op, effect]
     condEffect:
       type: object
@@ -150,10 +153,10 @@ properties:
           const: when
         condition:
           type:
-            $ref: $def/goal
+            $ref: $defs/goal
         effect:
           type:
-            $ref: $def/effect
+            $ref: $defs/effect
       required: [op, condition, effect]
     quantifiedEffect:
       type: object
@@ -165,10 +168,10 @@ properties:
             - const: exists
         boundVars:
           type:
-            $ref: $def/typelist
+            $ref: $defs/typelist
         effect:
           type:
-            $ref: $def/effect
+            $ref: $defs/effect
     atomicTerm:
       type: object
       properties:
@@ -183,12 +186,12 @@ properties:
         - args
     goal:
       oneof:
-        - $ref: $def/atomicTerm
+        - $ref: $defs/atomicTerm
         - null
-        - $ref: $def/negatedGoal
-        - $ref: $def/naryOpGoal
-        - $ref: $def/binaryOpGoal
-        - $ref: $def/quantifiedGoal
+        - $ref: $defs/negatedGoal
+        - $ref: $defs/naryOpGoal
+        - $ref: $defs/binaryOpGoal
+        - $ref: $defs/quantifiedGoal
     negatedGoal:
       type: object
       properties:
@@ -197,7 +200,7 @@ properties:
           const: not
         operand:
           type:
-            $ref: $def/goal
+            $ref: $defs/goal
     binaryOpGoal:
       type: object
       properties:
@@ -207,10 +210,10 @@ properties:
             - const: imply
         operand1:
           type:
-            $ref: $def/goal
+            $ref: $defs/goal
         operand2:
           type:
-            $ref: $def/goal
+            $ref: $defs/goal
       required: [op, operand1, operand2]
     naryOpGoal:
       type: object
@@ -223,7 +226,7 @@ properties:
         operands:
           type: array
           items:
-            $ref: $def/goal
+            $ref: $defs/goal
       required: [op, operands]
     quantifiedGoal:
       type: object
@@ -235,10 +238,10 @@ properties:
             - const: exists
         boundVars:
           type:
-            $ref: $def/typelist
+            $ref: $defs/typelist
         effect:
           type:
-            $ref: $def/goal
+            $ref: $defs/goal
     
 
 
@@ -246,15 +249,15 @@ properties:
         type: object
         properties:
           effect:
-            type: $def/effect
+            type: $defs/effect
           name:
             type: string
           parameters:
             type:
-              $ref: $def/typelist
+              $ref: $defs/typelist
           precondition:
             type:
-              $ref: $def/goal
+              $ref: $defs/goal
         required:
           - effect
           - name
@@ -267,25 +270,24 @@ properties:
         args:
           type: array
               items:
-                - type: string
-                - type: string
-        predicate:
+                type: string
+        taskName:
           type: string
      required:
         - args
-        - predicate
+        - taskName
 
     taskDef:
       type: object
       properties:
         args:
           type:
-            $ref: $def/typelist
-        predicate:
+            $ref: $defs/typelist
+        taskName:
           type: string
      required:
         - args
-        - predicate
+        - taskName
 
 
     
