@@ -1,8 +1,25 @@
 (defpackage hddl-json
   (:use common-lisp hddl-utils cl-json iterate)
-  (:export json-dump-domain))
+  (:export #:json-dump-domain
+           #:json-dump-problem))
 
 (in-package :hddl-json)
+
+(defmethod json:encode-json :around ((s symbol) &optional (stream *json-output*))
+  (if (keywordp s)
+      (call-next-method)
+      (let ((s (string-downcase (symbol-name s))))
+          (json::write-json-string s stream))))
+
+(defun jsonify-sym (sym)
+  "Alternative way of translating CL symbols to JSON strings.
+We keep the old method for keywords, which are used as property names,
+and should be CamelCase.  But for symbols used in definitions (e.g., task
+or predicate names), symbols should just be turned into down-cased strings,
+and notably hyphens should not be replaced."
+  (if (keywordp sym)
+      (lisp-to-camel-case sym)
+      (string-downcase sym)))
 
 (defun json-dump-domain (domain &optional (stream *json-output*))
   "Print a JSON representation of DOMAIN to STREAM."
@@ -75,6 +92,38 @@
               (json-dump-method x stream)))))
       (values))))
 
+(defun json-dump-problem (problem &optional (stream *json-output*))
+  "Print a JSON representation of PROBLEM to STREAM."
+  (let ((*json-output* stream))
+    (with-object ()
+      (encode-object-member '#:|$schema| "https://www.sift.net/hddl/draft/2023-07-28/problem")
+      (encode-object-member 'name (string-downcase (symbol-name (problem-name problem))))
+      (encode-object-member 'domain (string-downcase (symbol-name (problem-domain problem))))
+      (as-object-member (:requirements)
+        (let ((*lisp-identifier-name-to-json* #'(lambda (i) (string-downcase i))))
+          (encode-json (problem-requirements problem))))
+      (as-object-member (:objects)
+        (with-array ()
+          (let ((alist
+                  (hddl-utils:typelist-to-alist
+                   (pddl-utils:canonicalize-types
+                    (problem-objects problem)))))
+            (iter (for (constant . type) in alist)
+              (as-array-member ()
+                (with-object ()
+                  (encode-object-member :name constant)
+                  (encode-object-member :type type)))))))
+      (as-object-member (:init)
+        (with-array ()
+          (iter (for fact in (problem-state problem))
+            (as-array-member ()
+              (json-dump-atom fact stream)))))
+      (as-object-member (:goal)
+        (json-dump-goal (problem-goal problem) stream))
+      (as-object-member (:htn)
+        (json-dump-htn (problem-htn problem) stream))
+      (values))))
+
 (defun json-dump-action (action &optional (stream *json-output*))
   (let ((*json-output* stream))
     (with-object ()
@@ -93,7 +142,7 @@
       (as-object-member (:parameters)
         (json-dump-typelist (method-parameters method) stream))
       (as-object-member (:task)
-        (json-dump-atom (method-task method) stream))
+        (json-dump-task (method-task method) stream))
       (as-object-member (:precondition)
         (json-dump-goal (method-precondition method) stream))
       (as-object-member (:task-network)
@@ -120,13 +169,23 @@
            )))))
 
 (defun json-dump-atom (atom &optional (stream *json-output*))
-  "Dump ATOM as JSON object, treading it as a PDDL or HDDL atomic formula,
+  "Dump ATOM as JSON object, treating it as a PDDL or HDDL atomic formula,
 with \"predicate\" and \"args\" (array) components."
   (with-object (stream)
     (encode-object-member :predicate (first atom) stream)
     (as-object-member (:args stream)
       (with-array (stream)
         (dolist (x (rest atom))
+          (encode-array-member x stream))))))
+
+(defun json-dump-task (task &optional (stream *json-output*))
+  "Dump TASK as JSON object, treating it as a PDDL or HDDL atomic task,
+with \"taskName\" and \"args\" (array) components."
+  (with-object (stream)
+    (encode-object-member :task-name (first task) stream)
+    (as-object-member (:args stream)
+      (with-array (stream)
+        (dolist (x (rest task))
           (encode-array-member x stream))))))
 
 
@@ -229,11 +288,25 @@ with \"predicate\" and \"args\" (array) components."
      (as-object-member (:effect)
        (json-dump-effect (third effect))))))
 
-(defun json-dump-ordered-subtasks (subtask-conj &optional (stream *json-output*))
+(defun json-dump-ordered-subtasks (subtask-conj &optional (stream *json-output*) (as-object t))
   (let ((*json-output* stream))
-   (with-object ()
-     (as-object-member (:ordered-subtasks)
-       (with-array ()
-         (dolist (x (rest (pddl-utils::flatten-conjunction subtask-conj)))
-           (as-array-member ()
-             (json-dump-atom x stream))))))))
+    (flet ((dump-subtasks ()
+             (as-object-member (:ordered-subtasks)
+        (with-array ()
+          (dolist (x (rest (pddl-utils::flatten-conjunction subtask-conj)))
+            (as-array-member ()
+              (json-dump-task x stream)))))))
+      (if as-object
+          (with-object ()
+            (dump-subtasks))
+          (dump-subtasks)))))
+
+(defun json-dump-htn (htn &optional (stream *json-output*))
+  (let ((*json-output* stream))
+    (assert (typep htn 'p-htn))
+    (with-object ()
+      (as-object-member (:parameters)
+        (json-dump-typelist (hddl-utils:canonicalize-types (p-htn-parameters htn)) stream))
+      (if (hddl-utils::ordered-task-net-p htn)
+          (json-dump-ordered-subtasks (p-htn-ordered-subtasks htn) stream nil)
+          (error "Translating partially-ordered problem-HTN's not yet implemented")))))
