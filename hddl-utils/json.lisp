@@ -5,11 +5,23 @@
 
 (in-package :hddl-json)
 
+(defvar *hddl-encoding*
+  nil
+  "Should be set to true when encoding HDDL as JSON so that symbols
+  are serialized correctly.")
+
+
+;;; When encoding a symbol, use the normal camel case output for
+;;; keys in dictionaries, but simply downcase symbols for values
+;;; in dictionaries -- which are the actual expressions in the source
+;;; HDDL.
 (defmethod json:encode-json :around ((s symbol) &optional (stream *json-output*))
-  (if (keywordp s)
-      (call-next-method)
-      (let ((s (string-downcase (symbol-name s))))
-          (json::write-json-string s stream))))
+  (if *hddl-encoding*
+      (if (keywordp s)
+          (call-next-method)
+          (let ((s (string-downcase (symbol-name s))))
+            (json::write-json-string s stream)))
+      (call-next-method)))
 
 (defun jsonify-sym (sym)
   "Alternative way of translating CL symbols to JSON strings.
@@ -23,7 +35,8 @@ and notably hyphens should not be replaced."
 
 (defun json-dump-domain (domain &optional (stream *json-output*))
   "Print a JSON representation of DOMAIN to STREAM."
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
     (with-object ()
       (encode-object-member '#:|$schema| "https://www.sift.net/hddl/draft/2023-07-28/domain")
       (encode-object-member 'name (string-downcase (symbol-name (domain-name domain))))
@@ -94,7 +107,8 @@ and notably hyphens should not be replaced."
 
 (defun json-dump-problem (problem &optional (stream *json-output*))
   "Print a JSON representation of PROBLEM to STREAM."
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
     (with-object ()
       (encode-object-member '#:|$schema| "https://www.sift.net/hddl/draft/2023-07-28/problem")
       (encode-object-member 'name (string-downcase (symbol-name (problem-name problem))))
@@ -125,7 +139,8 @@ and notably hyphens should not be replaced."
       (values))))
 
 (defun json-dump-action (action &optional (stream *json-output*))
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
     (with-object ()
       (encode-object-member :name (action-name action))
       (as-object-member (:parameters)
@@ -136,7 +151,8 @@ and notably hyphens should not be replaced."
         (json-dump-effect (action-effect action) stream)))))
 
 (defun json-dump-method (method &optional (stream *json-output*))
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
     (with-object ()
       (encode-object-member :name (method-name method))
       (as-object-member (:parameters)
@@ -151,7 +167,8 @@ and notably hyphens should not be replaced."
             (error "JSON serialization does not handle partially-ordered HTNs."))))))
 
 (defun json-dump-goal (goal &optional (stream *json-output*))
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
     (if (null goal)
         (json:encode-json goal stream)
         (case (first goal)
@@ -171,33 +188,39 @@ and notably hyphens should not be replaced."
 (defun json-dump-atom (atom &optional (stream *json-output*))
   "Dump ATOM as JSON object, treating it as a PDDL or HDDL atomic formula,
 with \"predicate\" and \"args\" (array) components."
-  (with-object (stream)
-    (encode-object-member :predicate (first atom) stream)
-    (as-object-member (:args stream)
-      (with-array (stream)
-        (dolist (x (rest atom))
-          (encode-array-member x stream))))))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
+    (with-object (stream)
+      (encode-object-member :predicate (first atom) stream)
+      (as-object-member (:args stream)
+        (with-array (stream)
+          (dolist (x (rest atom))
+            (encode-array-member x stream)))))))
 
 (defun json-dump-task (task &optional (stream *json-output*))
   "Dump TASK as JSON object, treating it as a PDDL or HDDL atomic task,
 with \"taskName\" and \"args\" (array) components."
-  (with-object (stream)
-    (encode-object-member :task-name (first task) stream)
-    (as-object-member (:args stream)
-      (with-array (stream)
-        (dolist (x (rest task))
-          (encode-array-member x stream))))))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
+    (with-object (stream)
+      (encode-object-member :task-name (first task) stream)
+      (as-object-member (:args stream)
+        (with-array (stream)
+          (dolist (x (rest task))
+            (encode-array-member x stream))))))
 
 
 (defun json-dump-negation (goal &optional (stream *json-output*))
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
    (with-object ()
      (encode-object-member :op 'not)
      (as-object-member (:operand)
        (json-dump-atom (second goal))))))
 
 (defun json-dump-nary (goal &optional (stream *json-output*))
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
    (with-object ()
      (encode-object-member :op (first goal))
      (as-object-member (:operands)
@@ -207,7 +230,8 @@ with \"taskName\" and \"args\" (array) components."
              (json-dump-goal x))))))))
 
 (defun json-dump-typelist (typelist &optional (stream *json-output*))
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
     (let ((alist (typelist-to-alist (hddl-utils:canonicalize-types typelist))))
      (with-array ()
        (iter (for (name . type) in alist)
@@ -218,7 +242,8 @@ with \"taskName\" and \"args\" (array) components."
 
 
 (defun json-dump-binary (goal &optional (stream *json-output*))
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
    (with-object ()
      (encode-object-member :op (first goal))
      (as-object-member (:operand1)
@@ -227,7 +252,8 @@ with \"taskName\" and \"args\" (array) components."
        (json-dump-goal (third goal))))))
 
 (defun json-dump-quantified (goal &optional (stream *json-output*))
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
    (with-object ()
      (encode-object-member :op (first goal))
      (as-object-member (:bound-vars)
@@ -236,7 +262,8 @@ with \"taskName\" and \"args\" (array) components."
        (json-dump-goal (third goal))))))
 
 (defun json-dump-effect (effect &optional (stream *json-output*))
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
     (if (null effect)
         (json:encode-json effect stream)
         (case (first effect)
@@ -253,7 +280,8 @@ with \"taskName\" and \"args\" (array) components."
            (json-dump-atom effect stream))))))
 
 (defun json-dump-conj-effect (effect &optional (stream *json-output*))
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
    (with-object ()
      (encode-object-member :op 'and)
      (as-object-member (:effects)
@@ -264,14 +292,16 @@ with \"taskName\" and \"args\" (array) components."
 
 
 (defun json-dump-negated-effect (goal &optional (stream *json-output*))
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
    (with-object ()
      (encode-object-member :op 'not)
      (as-object-member (:operand)
        (json-dump-effect (second goal) stream)))))
 
 (defun json-dump-cond-effect (goal &optional (stream *json-output*))
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
    (with-object ()
      (encode-object-member :op :when)
      (as-object-member (:condition)
@@ -280,7 +310,8 @@ with \"taskName\" and \"args\" (array) components."
        (json-dump-effect (third goal))))))
 
 (defun json-dump-quantified-effect (effect &optional (stream *json-output*))
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
    (with-object ()
      (encode-object-member :op (first effect))
      (as-object-member (:bound-vars)
@@ -289,7 +320,8 @@ with \"taskName\" and \"args\" (array) components."
        (json-dump-effect (third effect))))))
 
 (defun json-dump-ordered-subtasks (subtask-conj &optional (stream *json-output*) (as-object t))
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
     (flet ((dump-subtasks ()
              (as-object-member (:ordered-subtasks)
         (with-array ()
@@ -302,7 +334,8 @@ with \"taskName\" and \"args\" (array) components."
           (dump-subtasks)))))
 
 (defun json-dump-htn (htn &optional (stream *json-output*))
-  (let ((*json-output* stream))
+  (let ((*json-output* stream)
+        (*hddl-encoding* t))
     (assert (typep htn 'p-htn))
     (with-object ()
       (as-object-member (:parameters)
