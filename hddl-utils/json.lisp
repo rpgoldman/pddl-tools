@@ -207,7 +207,7 @@ with \"taskName\" and \"args\" (array) components."
       (as-object-member (:args stream)
         (with-array (stream)
           (dolist (x (rest task))
-            (encode-array-member x stream))))))
+            (encode-array-member x stream)))))))
 
 
 (defun json-dump-negation (goal &optional (stream *json-output*))
