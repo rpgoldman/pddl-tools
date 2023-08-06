@@ -1,10 +1,7 @@
 $schema: http://json-schema.org/draft-07/schema#
+$id: https://www.sift.net/hddl/draft/2023-07-31/domain
 type: object
 properties:
-  $schema:
-    type: string
-    format: uri
-    const: https://www.sift.net/hddl/draft/2023-07-31/domain
   name:
     type: string
   actions:
@@ -58,49 +55,49 @@ properties:
         - type
 $defs:
   effect:
-    type: object
     oneOf:
-      - null
       - $ref: "#/$defs/atomicTerm"
       - $ref: "#/$defs/negatedEffect"
       - $ref: "#/$defs/condEffect"
       - $ref: "#/$defs/quantifiedEffect"
       - $ref: "#/$defs/conjEffect"
+
   typelist:
     type: array
     items:
-      type: object
-      properties:
-        name:
-          type: string
-        type:
-          type: string
-      required: name
+      $ref: "#/$defs/typeCell"
     title: Typed list
     description: >
       A list of objects, each of which associates a name with
       a type. Typing is optional in PDDL/HDDL, so the type
-      property is optional.        
+      property is optional.
+
+  typeCell:
+    type: object
+    properties:
+      name:
+        type: string
+      type:
+        type: string
+    required: [name]
+
   conjEffect:
     type: object
     properties:
       op:
-        type: string
         const: and
       effects:
         type: array
         items:
           $ref: "#/$defs/effect"
-    required: [op, effect]
+    required: [op, effects]
   negatedEffect:
     type: object
     properties:
       op:
-        type: string
         const: not
       effect:
-        type:
-          $ref: "#/$defs/effect"
+        $ref: "#/$defs/effect"
     required: [op, effect]
   condEffect:
     type: object
@@ -117,14 +114,17 @@ $defs:
     type: object
     properties:
       op:
-        type: string
-        oneOf:
-          - const: forall
-          - const: exists
+        enum:
+          - forall
+          - exists
       boundVars:
         $ref: "#/$defs/typelist"
       effect:
         $ref: "#/$defs/effect"
+    required:
+      - op
+      - boundVars
+      - effect
   atomicTerm:
     type: object
     properties:
@@ -140,7 +140,6 @@ $defs:
   goal:
     oneOf:
       - $ref: "#/$defs/atomicTerm"
-      - null
       - $ref: "#/$defs/negatedGoal"
       - $ref: "#/$defs/naryOpGoal"
       - $ref: "#/$defs/binaryOpGoal"
@@ -153,11 +152,13 @@ $defs:
         const: not
       operand:
         $ref: "#/$defs/goal"
+    required:
+      - op
+      - operand
   binaryOpGoal:
     type: object
     properties:
       op:
-        type: string
         enum:
           - imply
       operand1:
@@ -170,7 +171,6 @@ $defs:
     type: object
     properties:
       op:
-        type: string
         enum:
           - and
           - or
@@ -186,7 +186,6 @@ $defs:
     type: object
     properties:
       op:
-        type: string
         enum:
           - forall
           - exists
@@ -194,10 +193,10 @@ $defs:
         $ref: "#/$defs/typelist"
       effect:
         $ref: "#/$defs/goal"
-      required:
-        - op
-        - boundVars
-        - effect
+    required:
+      - op
+      - boundVars
+      - effect
 
   action:
     type: object
@@ -248,21 +247,17 @@ $defs:
       name:
         type: string
       parameters:
-       type: array
-       items:
-         $ref: "#/$defs/typelist"
+        $ref: "#/$defs/typelist"
       precondition:
         $ref: "#/$defs/goal"
       task:
         $ref: "#/$defs/task"
       taskNetwork:
-        type:
-          oneOf:
-            - $ref: "#/$defs/orderedTaskNetwork"
+        oneOf:
+          - $ref: "#/$defs/orderedTaskNetwork"
     required:
       - name
       - parameters
-      - precondition
       - task
       - taskNetwork
 
@@ -273,7 +268,7 @@ $defs:
         type: array
         items:
           $ref: "#/$defs/task"
- 
+
 
 
 required:

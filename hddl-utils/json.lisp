@@ -10,6 +10,9 @@
   "Should be set to true when encoding HDDL as JSON so that symbols
   are serialized correctly.")
 
+(defparameter +domain-schema+ "https://www.sift.net/hddl/draft/2023-07-31/domain")
+(defparameter +problem-schema+ "https://www.sift.net/hddl/draft/2023-07-31/problem")
+
 
 ;;; When encoding a symbol, use the normal camel case output for
 ;;; keys in dictionaries, but simply downcase symbols for values
@@ -38,7 +41,7 @@ and notably hyphens should not be replaced."
   (let ((*json-output* stream)
         (*hddl-encoding* t))
     (with-object ()
-      (encode-object-member '#:|$schema| "https://www.sift.net/hddl/draft/2023-07-28/domain")
+      (encode-object-member '#:|$schema| +domain-schema+)
       (encode-object-member 'name (string-downcase (symbol-name (domain-name domain))))
       (as-object-member (:types)
         (with-array ()
@@ -110,7 +113,7 @@ and notably hyphens should not be replaced."
   (let ((*json-output* stream)
         (*hddl-encoding* t))
     (with-object ()
-      (encode-object-member '#:|$schema| "https://www.sift.net/hddl/draft/2023-07-28/problem")
+      (encode-object-member '#:|$schema| +problem-schema+)
       (encode-object-member 'name (string-downcase (symbol-name (problem-name problem))))
       (encode-object-member 'domain (string-downcase (symbol-name (problem-domain problem))))
       (as-object-member (:requirements)
@@ -145,10 +148,12 @@ and notably hyphens should not be replaced."
       (encode-object-member :name (action-name action))
       (as-object-member (:parameters)
         (json-dump-typelist (action-params action) stream))
-      (as-object-member (:precondition)
-        (json-dump-goal (action-precondition action) stream))
-      (as-object-member (:effect)
-        (json-dump-effect (action-effect action) stream)))))
+      (when (action-precondition action)
+       (as-object-member (:precondition)
+         (json-dump-goal (action-precondition action) stream)))
+      (unless (null (action-effect action))
+       (as-object-member (:effect)
+         (json-dump-effect (action-effect action) stream))))))
 
 (defun json-dump-method (method &optional (stream *json-output*))
   (let ((*json-output* stream)
@@ -159,8 +164,9 @@ and notably hyphens should not be replaced."
         (json-dump-typelist (method-parameters method) stream))
       (as-object-member (:task)
         (json-dump-task (method-task method) stream))
-      (as-object-member (:precondition)
-        (json-dump-goal (method-precondition method) stream))
+      (when (method-precondition method)
+       (as-object-member (:precondition)
+         (json-dump-goal (method-precondition method) stream)))
       (as-object-member (:task-network)
         (if (ordered-method-p method)
             (json-dump-ordered-subtasks (method-subtasks method) stream)
@@ -264,20 +270,19 @@ with \"taskName\" and \"args\" (array) components."
 (defun json-dump-effect (effect &optional (stream *json-output*))
   (let ((*json-output* stream)
         (*hddl-encoding* t))
-    (if (null effect)
-        (json:encode-json effect stream)
-        (case (first effect)
-          (and
-           ;; n-ary operators
-           (json-dump-conj-effect effect stream))
-          (not
-           (json-dump-negated-effect effect stream))
-          (when
-           (json-dump-cond-effect effect stream))
-          ((forall exists)
-           (json-dump-quantified-effect effect stream))
-          (otherwise
-           (json-dump-atom effect stream))))))
+    (unless (null effect)
+      (case (first effect)
+        (and
+         ;; n-ary operators
+         (json-dump-conj-effect effect stream))
+        (not
+         (json-dump-negated-effect effect stream))
+        (when
+            (json-dump-cond-effect effect stream))
+        ((forall exists)
+         (json-dump-quantified-effect effect stream))
+        (otherwise
+         (json-dump-atom effect stream))))))
 
 (defun json-dump-conj-effect (effect &optional (stream *json-output*))
   (let ((*json-output* stream)
@@ -296,7 +301,7 @@ with \"taskName\" and \"args\" (array) components."
         (*hddl-encoding* t))
    (with-object ()
      (encode-object-member :op 'not)
-     (as-object-member (:operand)
+     (as-object-member (:effect)
        (json-dump-effect (second goal) stream)))))
 
 (defun json-dump-cond-effect (goal &optional (stream *json-output*))
