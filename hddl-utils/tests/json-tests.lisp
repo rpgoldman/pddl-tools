@@ -75,72 +75,90 @@
                  '(OR)
                  str)))))
 
+(defun binary-present-p (binary)
+  (multiple-value-bind (output error-output success)
+      (uiop:run-program (list "/usr/bin/type" binary)
+                        :ignore-error-status t
+                        :output :string :error-output :output)
+    (declare (ignore error-output))
+    (or (zerop success)
+        (progn (cerror "Install binary and retry" "Unable to find JSON manipulating binary \"~a\" in PATH.~%Output: ~a" binary output)
+               t))))
+
+(defmacro with-json-binaries (&rest body)
+  `(when (and
+          (binary-present-p "yq")
+          (binary-present-p "check-jsonschema"))
+     ,@body))
+
 (test validate-domain
-  (block test-block
-    (let ((domain (hddl-utils:read-hddl-file
-                   (namestring (asdf:system-relative-pathname "hddl-to-json" "hddl-utils/tests/ipc2020-syntactically-total-order-transport-domain.hddl"))))
-          path-name-string)
-      (uiop/driver:with-temporary-file (:stream str :pathname pn :prefix "transport-domain")
-        (setf path-name-string (namestring pn))
-        (is-true (typep domain 'hddl-utils::domain))
-        (json-dump-domain domain str)
-        :close-stream
-        (uiop:with-temporary-file (:pathname schema-file :prefix "domain-schema")
-          (let ((schema-filename (namestring schema-file)))
-            (multiple-value-bind (ignore error-output success)
-                (uiop:run-program (list "yq" "--input-format" "yaml" "--output-format" "json"
-                                        "--exit-status"
-                                        (namestring (asdf:system-relative-pathname "hddl-to-json" "json-schemas/domain.yaml")))
-                                  :output schema-file
-                                  :error-output :string
-                                  :ignore-error-status t)
-              (declare (ignore ignore))
-              (is (zerop success))
-              (unless (zerop success)
-                (format t "~&Exit code ~d for writing JSON schema in ~a~%. Error output: ~a~%"
-                        success schema-filename error-output)
-                (return-from test-block nil)))
-            (multiple-value-bind (output error-output success)
-                (uiop:run-program (list "check-jsonschema" "--schemafile" schema-filename path-name-string)
-                                  :ignore-error-status t :error-output :output :output :string)
-              (declare (ignore error-output))
-              (is (zerop success))
-              (unless (zerop success)
-                (format t "~&Exit code ~d for validating JSON against schema in ~a~%Error output:~%~a~%"
-                        success schema-filename output)
-                (return-from test-block nil)))))))))
+  (with-json-binaries
+   (block test-block
+     (let ((domain (hddl-utils:read-hddl-file
+                    (namestring (asdf:system-relative-pathname "hddl-to-json" "hddl-utils/tests/ipc2020-syntactically-total-order-transport-domain.hddl"))))
+           path-name-string)
+       (uiop/driver:with-temporary-file (:stream str :pathname pn :prefix "transport-domain")
+         (setf path-name-string (namestring pn))
+         (is-true (typep domain 'hddl-utils::domain))
+         (json-dump-domain domain str)
+         :close-stream
+         (uiop:with-temporary-file (:pathname schema-file :prefix "domain-schema")
+           (let ((schema-filename (namestring schema-file)))
+             (multiple-value-bind (ignore error-output success)
+                 (uiop:run-program (list "yq" "--input-format" "yaml" "--output-format" "json"
+                                         "--exit-status"
+                                         (namestring (asdf:system-relative-pathname "hddl-to-json" "json-schemas/domain.yaml")))
+                                   :output schema-file
+                                   :error-output :string
+                                   :ignore-error-status t)
+               (declare (ignore ignore))
+               (is (zerop success))
+               (unless (zerop success)
+                 (format t "~&Exit code ~d for writing JSON schema in ~a~%. Error output: ~a~%"
+                         success schema-filename error-output)
+                 (return-from test-block nil)))
+             (multiple-value-bind (output error-output success)
+                 (uiop:run-program (list "check-jsonschema" "--schemafile" schema-filename path-name-string)
+                                   :ignore-error-status t :error-output :output :output :string)
+               (declare (ignore error-output))
+               (is (zerop success))
+               (unless (zerop success)
+                 (format t "~&Exit code ~d for validating JSON against schema in ~a~%Error output:~%~a~%"
+                         success schema-filename output)
+                 (return-from test-block nil))))))))))
 
 (test validate-problem
-  (block test-block
-    (let ((problem (hddl-utils:read-hddl-file
-                    (namestring (asdf:system-relative-pathname "hddl-to-json" "hddl-utils/tests/ipc2020-syntactically-total-order-transport-p01.hddl"))))
-          path-name-string)
-      (uiop/driver:with-temporary-file (:stream str :pathname pn :prefix "transport-problem")
-        (setf path-name-string (namestring pn))
-        (is-true (typep problem 'hddl-utils:problem))
-        (json-dump-problem problem str)
-        :close-stream
-        (uiop:with-temporary-file (:pathname schema-file :prefix "problem-schema")
-          (let ((schema-filename (namestring schema-file)))
-            (multiple-value-bind (ignore error-output success)
-                (uiop:run-program (list "yq" "--input-format" "yaml" "--output-format" "json"
-                                        "--exit-status"
-                                        (namestring (asdf:system-relative-pathname "hddl-to-json" "json-schemas/problem.yaml")))
-                                  :output schema-file
-                                  :error-output :string
-                                  :ignore-error-status t)
-              (declare (ignore ignore))
-              (unless (zerop success)
-                (format t "~&Exit code ~d for writing JSON schema in ~a~%. Error output: ~a~%"
-                        success schema-filename error-output)
-                (return-from test-block nil))
-              (is (zerop success)))
-            (multiple-value-bind (output error-output success)
-                (uiop:run-program (list "check-jsonschema" "--schemafile" schema-filename path-name-string)
-                                  :ignore-error-status t :error-output :output :output :string)
-              (declare (ignore error-output))
-              (is (zerop success))
-              (unless (zerop success)
-                (format t "~&Exit code ~d for validating JSON against schema in ~a~%Error output:~%~a~%"
-                        success schema-filename output)
-                (return-from test-block nil)))))))))
+  (with-json-binaries
+      (block test-block
+        (let ((problem (hddl-utils:read-hddl-file
+                        (namestring (asdf:system-relative-pathname "hddl-to-json" "hddl-utils/tests/ipc2020-syntactically-total-order-transport-p01.hddl"))))
+              path-name-string)
+          (uiop/driver:with-temporary-file (:stream str :pathname pn :prefix "transport-problem")
+            (setf path-name-string (namestring pn))
+            (is-true (typep problem 'hddl-utils:problem))
+            (json-dump-problem problem str)
+            :close-stream
+            (uiop:with-temporary-file (:pathname schema-file :prefix "problem-schema")
+              (let ((schema-filename (namestring schema-file)))
+                (multiple-value-bind (ignore error-output success)
+                    (uiop:run-program (list "yq" "--input-format" "yaml" "--output-format" "json"
+                                            "--exit-status"
+                                            (namestring (asdf:system-relative-pathname "hddl-to-json" "json-schemas/problem.yaml")))
+                                      :output schema-file
+                                      :error-output :string
+                                      :ignore-error-status t)
+                  (declare (ignore ignore))
+                  (unless (zerop success)
+                    (format t "~&Exit code ~d for writing JSON schema in ~a~%. Error output: ~a~%"
+                            success schema-filename error-output)
+                    (return-from test-block nil))
+                  (is (zerop success)))
+                (multiple-value-bind (output error-output success)
+                    (uiop:run-program (list "check-jsonschema" "--schemafile" schema-filename path-name-string)
+                                      :ignore-error-status t :error-output :output :output :string)
+                  (declare (ignore error-output))
+                  (is (zerop success))
+                  (unless (zerop success)
+                    (format t "~&Exit code ~d for validating JSON against schema in ~a~%Error output:~%~a~%"
+                            success schema-filename output)
+                    (return-from test-block nil))))))))))
