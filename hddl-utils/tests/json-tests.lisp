@@ -77,7 +77,7 @@
 
 (defun binary-present-p (binary)
   (multiple-value-bind (output error-output success)
-      (uiop:run-program (list "/usr/bin/type" binary)
+      (uiop:run-program (list "/usr/bin/which" binary)
                         :ignore-error-status t
                         :output :string :error-output :output)
     (declare (ignore error-output))
