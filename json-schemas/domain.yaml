@@ -210,10 +210,8 @@ $defs:
       precondition:
         $ref: "#/$defs/goal"
     required:
-      - effect
       - name
       - parameters
-      - precondition
 
 
 
