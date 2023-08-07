@@ -1,10 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
+$id: https://www.sift.net/hddl/draft/2023-08-01/problem
+
 type: object
 properties:
-  $schema:
-    type: string
-    format: uri
-    const: https://www.sift.net/hddl/draft/2023-08-01/problem
   name:
     type: string
   domain:
@@ -24,7 +22,6 @@ properties:
   htn:
     $ref: "#/$defs/problemHTN"
 required:
-  - $schema
   - name
   - init
   - htn
@@ -33,18 +30,21 @@ $defs:
   typelist:
     type: array
     items:
-      type: object
-      properties:
-        name:
-          type: string
-        type:
-          type: string
-      required: name
+      $ref: "#/$defs/typeCell"
     title: Typed list
     description: >
       A list of objects, each of which associates a name with
       a type. Typing is optional in PDDL/HDDL, so the type
       property is optional.        
+  typeCell:
+    type: object
+    properties:
+      name:
+        type: string
+      type:
+        type: string
+    required: [name]
+
   atomicTerm:
     type: object
     properties:
@@ -60,7 +60,6 @@ $defs:
   goal:
     oneOf:
       - $ref: "#/$defs/atomicTerm"
-      - null
       - $ref: "#/$defs/negatedGoal"
       - $ref: "#/$defs/naryOpGoal"
       - $ref: "#/$defs/binaryOpGoal"
@@ -70,10 +69,12 @@ $defs:
     properties:
       op:
         type: string
-        enum:
-          - not
+        const: not
       operand:
         $ref: "#/$defs/goal"
+    required:
+      - op
+      - operand
   binaryOpGoal:
     type: object
     properties:
@@ -90,7 +91,6 @@ $defs:
     type: object
     properties:
       op:
-        type: string
         enum:
           - and
           - or
@@ -99,3 +99,39 @@ $defs:
         items:
           $ref: "#/$defs/goal"
     required: [op, operands]
+  quantifiedGoal:
+    type: object
+    properties:
+      op:
+        enum:
+          - forall
+          - exists
+      boundVars:
+        $ref: "#/$defs/typelist"
+      effect:
+        $ref: "#/$defs/goal"
+    required:
+      - op
+      - boundVars
+      - effect
+
+  problemHTN:
+    type: object
+    properties:
+      parameters:
+        $ref: "#/$defs/typelist"
+      orderedSubtasks:
+        type: array
+        items:
+          $ref: "#/$defs/task"
+
+  task:
+    type: object
+    properties:
+      args:
+        type: array
+        items:
+          type: string
+      taskName:
+        type: string
+    required: [args, taskName]
