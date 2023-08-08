@@ -1,5 +1,5 @@
 ;;; -------------------------------------------------------------------------
-;;; Copyright 2011-2016, SIFT, LLC, Robert P. Goldman, and Ugur Kuter
+;;; Copyright 2011-2016,2023 SIFT, LLC, Robert P. Goldman, and Ugur Kuter
 ;;; Available under the BSD 3-clause license, see license.txt
 ;;;---------------------------------------------------------------------------
 
@@ -9,7 +9,7 @@
 (in-package :sift-pddl-asd)
 
 (defsystem :pddl
-  :version "1.1"
+  :version (:read-file-form "version.lisp-expr")
   :license "BSD 3-clause (see license.txt)"
   :serial t
   :pathname "pddl/"

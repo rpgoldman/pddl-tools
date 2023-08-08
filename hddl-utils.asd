@@ -11,7 +11,7 @@
 (defsystem :hddl-utils
     :name "SIFT-HDDL-UTILS"
     :license "BSD 3-clause (see license.txt)"
-    :version "3.0"
+    :version (:read-file-form "version.lisp-expr")
     :depends-on (hddl pddl-utils)
     :in-order-to ((test-op (test-op hddl-utils/tests)))
     :pathname "hddl-utils/"
@@ -27,6 +27,7 @@
 (defsystem :hddl-utils/tests
   :depends-on (pddl-utils fiveam)
   :defsystem-depends-on (fiveam-asdf)
+  :version (:read-file-form "version.lisp-expr")
   :serial t
   :class :fiveam-tester-system
   :test-names ((#:hddl-tests . :hddl-utils-tests)

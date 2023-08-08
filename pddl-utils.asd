@@ -1,5 +1,5 @@
 ;;; -------------------------------------------------------------------------
-;;; Copyright 2011-2016, SIFT, LLC, Robert P. Goldman, and Ugur Kuter
+;;; Copyright 2011-2016,2023 SIFT, LLC, Robert P. Goldman, and Ugur Kuter
 ;;; Available under the BSD 3-clause license, see license.txt
 ;;;---------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 (defsystem :pddl-utils
     :name "SIFT-PDDL-UTILS"
     :license "BSD 3-clause (see license.txt)"
-    :version "3.0"
+    :version (:read-file-form "version.lisp-expr")
     :depends-on (pddl iterate alexandria)
     :in-order-to ((test-op (test-op pddl-utils/tests)))
     :pathname "utils/"
@@ -27,6 +27,7 @@
 (defsystem :pddl-utils/tests
   :depends-on (pddl-utils fiveam)
   :defsystem-depends-on (fiveam-asdf)
+  :version (:read-file-form "version.lisp-expr")
   :serial t
   :class :fiveam-tester-system
   :test-names ((#:problem-acc . :pddl-utils-tests)
