@@ -11,7 +11,7 @@
 (defsystem :pddl-planners
     :name "SIFT-PDDL-PLANNERS"
     :license "BSD 3-clause (see license.txt)"
-    :version "2.0"
+    :version (:read-file-form "version.lisp-expr")
     :depends-on (iterate pddl pddl-utils)
 ;;    :in-order-to ((test-op (test-op pddl-planners-tests)))
     :pathname "planners/"

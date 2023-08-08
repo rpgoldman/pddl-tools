@@ -9,7 +9,7 @@
 (in-package :sift-hddl-asd)
 
 (defsystem :hddl
-  :version "1.0"
+  :version (:read-file-form "version.lisp-expr")
   :license "BSD 3-clause (see license.txt)"
   :serial t
   :depends-on ((:version "pddl" "1.1") "pddl-utils" "cl-ppcre")
