@@ -5,7 +5,7 @@
 
 (defsystem :external-planners
     :name "SIFT-EXTERNAL-PLANNERS"
-    :version "1.0"
+    :version  (:read-file-form "version.lisp-expr")
     :license "BSD 3-clause (see license.txt)"
     :weakly-depends-on (fd ff)
     :pathname "planners/"
