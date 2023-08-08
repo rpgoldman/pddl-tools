@@ -101,7 +101,7 @@
     (let ((version-string (uiop:run-program (list "yq" "--version") :output :string))
           major-version-number)
       (multiple-value-bind (success matches)
-          (cl-ppcre:scan-to-strings "yq +([^0-9]+)([0-9]+)" version-string)
+          (cl-ppcre:scan-to-strings "yq +([^0-9]?)([0-9]+)" version-string)
         (unless success (error "Failed to extract version number from \"~a\"" version-string))
         (setf major-version-number (parse-integer (aref matches 1) :junk-allowed t))
         (ecase major-version-number
