@@ -1,0 +1,281 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: https://www.sift.net/hddl/draft/2023-07-31/domain
+type: object
+properties:
+  name:
+    type: string
+  actions:
+    type: array
+    items:
+      $ref: "#/$defs/action"
+  constants:
+    $ref: "#/$defs/typelist"
+  methods:
+    type: array
+    items:
+      $ref: "#/$defs/method"
+  predicates:
+    type: array
+    items:
+      - type: object
+        properties:
+          name:
+            type: string
+          parameters:
+            $ref: "#/$defs/typelist"
+        required:
+          - name
+          - parameters
+  requirements:
+    type: array
+    items:
+      - type: string
+  tasks:
+    type: array
+    items:
+      type: object
+      properties:
+        name:
+          type: string
+        parameters:
+          $ref: "#/$defs/typelist"
+      required:
+        - name
+        - parameters
+  types:
+    type: array
+    items:
+      type: object
+      properties:
+        supertype:
+          type: string
+        type:
+          type: string
+      required:
+        - type
+$defs:
+  effect:
+    oneOf:
+      - $ref: "#/$defs/atomicTerm"
+      - $ref: "#/$defs/negatedEffect"
+      - $ref: "#/$defs/condEffect"
+      - $ref: "#/$defs/quantifiedEffect"
+      - $ref: "#/$defs/conjEffect"
+
+  typelist:
+    type: array
+    items:
+      $ref: "#/$defs/typeCell"
+    title: Typed list
+    description: >
+      A list of objects, each of which associates a name with
+      a type. Typing is optional in PDDL/HDDL, so the type
+      property is optional.
+
+  typeCell:
+    type: object
+    properties:
+      name:
+        type: string
+      type:
+        type: string
+    required: [name]
+
+  conjEffect:
+    type: object
+    properties:
+      op:
+        const: and
+      effects:
+        type: array
+        items:
+          $ref: "#/$defs/effect"
+    required: [op, effects]
+  negatedEffect:
+    type: object
+    properties:
+      op:
+        const: not
+      effect:
+        $ref: "#/$defs/effect"
+    required: [op, effect]
+  condEffect:
+    type: object
+    properties:
+      op:
+        type: string
+        const: when
+      condition:
+        $ref: "#/$defs/goal"
+      effect:
+        $ref: "#/$defs/effect"
+    required: [op, condition, effect]
+  quantifiedEffect:
+    type: object
+    properties:
+      op:
+        enum:
+          - forall
+          - exists
+      boundVars:
+        $ref: "#/$defs/typelist"
+      effect:
+        $ref: "#/$defs/effect"
+    required:
+      - op
+      - boundVars
+      - effect
+  atomicTerm:
+    type: object
+    properties:
+      predicate:
+        type: string
+      args:
+        type: array
+        items:
+          type: string
+    required:
+      - predicate
+      - args
+  goal:
+    oneOf:
+      - $ref: "#/$defs/atomicTerm"
+      - $ref: "#/$defs/negatedGoal"
+      - $ref: "#/$defs/naryOpGoal"
+      - $ref: "#/$defs/binaryOpGoal"
+      - $ref: "#/$defs/quantifiedGoal"
+  negatedGoal:
+    type: object
+    properties:
+      op:
+        type: string
+        const: not
+      operand:
+        $ref: "#/$defs/goal"
+    required:
+      - op
+      - operand
+  binaryOpGoal:
+    type: object
+    properties:
+      op:
+        enum:
+          - imply
+      operand1:
+        $ref: "#/$defs/goal"
+      operand2:
+        $ref: "#/$defs/goal"
+    required: [op, operand1, operand2]
+
+  naryOpGoal:
+    type: object
+    properties:
+      op:
+        enum:
+          - and
+          - or
+      operands:
+        type: array
+        items:
+          $ref: "#/$defs/goal"
+    required:
+      - op
+      - operands
+
+  quantifiedGoal:
+    type: object
+    properties:
+      op:
+        enum:
+          - forall
+          - exists
+      boundVars:
+        $ref: "#/$defs/typelist"
+      effect:
+        $ref: "#/$defs/goal"
+    required:
+      - op
+      - boundVars
+      - effect
+
+  action:
+    type: object
+    properties:
+      effect:
+        $ref: "#/$defs/effect"
+      name:
+        type: string
+      parameters:
+        $ref: "#/$defs/typelist"
+      precondition:
+        $ref: "#/$defs/goal"
+    required:
+      - name
+      - parameters
+
+
+
+  task:
+    type: object
+    properties:
+      args:
+        type: array
+        items:
+          type: string
+      taskName:
+        type: string
+    required:
+      - args
+      - taskName
+
+  taskDef:
+    type: object
+    properties:
+      args:
+        $ref: "#/$defs/typelist"
+      taskName:
+        type: string
+    required:
+      - args
+      - taskName
+
+  method:
+    type: object
+    properties:
+      name:
+        type: string
+      parameters:
+        $ref: "#/$defs/typelist"
+      precondition:
+        $ref: "#/$defs/goal"
+      task:
+        $ref: "#/$defs/task"
+      taskNetwork:
+        oneOf:
+          - $ref: "#/$defs/orderedTaskNetwork"
+    required:
+      - name
+      - parameters
+      - task
+      - taskNetwork
+
+  orderedTaskNetwork:
+    type: object
+    properties:
+      orderedSubtasks:
+        type: array
+        items:
+          $ref: "#/$defs/task"
+
+
+
+required:
+  - $schema
+  - actions
+  - constants
+  - methods
+  - name
+  - predicates
+  - requirements
+  - tasks
+  - types

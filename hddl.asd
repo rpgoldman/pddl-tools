@@ -3,20 +3,20 @@
 ;;; Available under the BSD 3-clause license, see license.txt
 ;;;---------------------------------------------------------------------------
 
-(defpackage :sift-pddl-asd
+(defpackage :sift-hddl-asd
   (:use :common-lisp :asdf))
 
-(in-package :sift-pddl-asd)
+(in-package :sift-hddl-asd)
 
-(defsystem :pddl
-  :version "1.1"
+(defsystem :hddl
+  :version "1.0"
   :license "BSD 3-clause (see license.txt)"
   :serial t
-  :pathname "pddl/"
-  :depends-on ("iterate")
-  :description "This system provides a package into which PDDL constructs
+  :depends-on ((:version "pddl" "1.1") "pddl-utils" "cl-ppcre")
+  :pathname "hddl/"
+  :description "This system provides a package into which HDDL constructs
 can be read, so that they can be shared across different programs manipulating
-PDDL.  Also provides a PDDL pretty-printer."
+HDDL."
   :components ((:file "package")      ; Package definition.
-               (:file "pddl-pprint") ; Pretty print functions
+               (:file "hddl-pprint") ; Pretty print and read functions
                ))

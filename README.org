@@ -1,10 +1,49 @@
-* License
+* PDDL-TOOLS library
+
+This library contains multiple Common Lisp ASDF systems for
+manipulating [[https://planning.wiki/guide/whatis/pddl][Planning Domain Definition Language (PDDL)]], and --
+newly added (summer 2023) -- [[https://arxiv.org/abs/1911.05499][Hierarchical Domain Definition Language (HDDL)]].
+
+These libraries enable a programmer to parse PDDL and HDDL, generate
+and modify parsed PDDL and HDDL expressions, and then write these
+expressions to files for use by AI planners.  Constructs handled
+include domain definitions, problem definitions, and plans.
+
+Two additional special functionalities:
++ PDDL-PLANNERS :: Attempts to provide a uniform CL interface to a
+  number of AI planning systems to support automating their use.
++ HDDL-JSON :: Provides JSON schemas for HDDL constructs (domains and
+  problems) and code for emitting HDDL domains and problems as JSON.
+  We hope to later provide the same capabilities for PDDL, and also
+  support reading domains and problems as JSON, not just writing them,
+  so that planning models can be authored in JSON as well as in PDDL/HDDL.
+  We believe that this can streamline the development of AI planning
+  by obviating the need to incorporate HDDL and PDDL parsers in
+  planners.
+
+** Notes
+
+We plan to provide an executable wrapper around
+these libraries for parsing and translation, which will be available
+for building -- for those comfortable with Common Lisp -- or for use
+through Docker images.
+
+Support for HDDL is as yet only partial.  In particular, the library only
+support /totally-ordered/ subtasks, not partially-ordered ones.  We
+expect to add this shortly.  Since we do not ourselves need these
+constructs, getting it added will be hastened substantially by
+requests from potential users (or, even more, pull requests)!
+
+** License
 
 This code is made publicly available by SIFT, LLC under the terms of the
 3-clause BSD license, attached as [[file:license.txt][license.txt]].
 
-* Component libraries
-** PDDL
+** Component libraries
+
+*** PDDL
+
+**** PDDL system
 
 This does not provide any PDDL-wrangling functions (well, with the exception of
 =PPRINT-PDDL=, whose job it is to print PDDL /readably/).  It simply provides
@@ -14,7 +53,7 @@ bits of code can all wrangle PDDL without getting into package hell.  In
 particular, it means that one bit of code can read PDDL into an s-expression
 that other code can interact with.
 
-** PDDL-UTILS
+**** PDDL-UTILS
 
 PDDL-wrangling functions.  These are made to allow you to read and write PDDL
 files, especially problem files, domain files, and plans.  There are also
@@ -23,7 +62,7 @@ of this library is for programmers to be able to make derivative or templated
 domains and problems.  You can read a problem (domain), set some of its slots
 programmatically, and then write it out to a file.
 
-** PDDL-PLANNERS
+**** PDDL-PLANNERS
 
 This attempts to provide a uniform-ish API to invoke a number of different
 planners from Common Lisp.  This is just the core framework here.
@@ -35,6 +74,31 @@ methods for your new planners.
 This approach is only somewhat successful, since we find that planners often
 have very complex invocation procedures with very particular sets of
 configuration options.
+
+*** HDDL
+
+**** HDDL
+
+Playing a role similar to the [[#PDDL system]], this library provides the
+~HDDL~ package (Common Lisp namespace) into which HDDL domain can be
+parsed.
+
+**** HDDL-UTILS
+
+This is the HDDL-wrangling system proper.  It plays an analogous role
+to the [[#PDDL-UTILS]] system.
+
+**** HDDL-JSON
+
+This system provides the two key interface functions
+~HDDL-JSON:JSON-DUMP-DOMAIN~ and ~HDDL-JSON:JSON-DUMP-PROBLEM~ which,
+as their names suggest, provide the ability to write domains and
+problems to JSON files.
+
+*** JSON-SCHEMAS
+
+This is not a library, but rather a repository of JSON schemas for
+HDDL as written to JSON.
 
 
 

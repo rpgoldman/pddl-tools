@@ -12,7 +12,7 @@
     :name "SIFT-PDDL-UTILS"
     :license "BSD 3-clause (see license.txt)"
     :version "3.0"
-    :depends-on (pddl iterate)
+    :depends-on (pddl iterate alexandria)
     :in-order-to ((test-op (test-op pddl-utils/tests)))
     :pathname "utils/"
     :components ((:file "package")      ; Package definition.

@@ -79,8 +79,11 @@ in the form of a list of actions."
 ;;; Type checkers
 ;;;---------------------------------------------------------------------------
 (declaim (inline pddl-symbol))
-(defun pddl-symbol (symbol)
-  (uiop:intern* symbol *pddl-package*))
+(defun pddl-symbol (symbol &optional (package *pddl-package*))
+  (let ((symbol (etypecase symbol
+                  (string (string-upcase (string-left-trim (list #\space #\tab) symbol)))
+                  (symbol symbol))))
+   (uiop:intern* symbol package)))
 
 (defun define-keyword ()
   (pddl-symbol '#:define))
@@ -107,6 +110,30 @@ in the form of a list of actions."
 (defun domain-spec-p (lst)
   (and (listp lst)
        (eq (first lst) (domain-keyword))))
+
+(defun typed-list-p (lst)
+  "True if LST is a list of variables, optionally with types."
+  (iter (with l = lst)
+    (while l)
+    (let* ((dp (position '- l))
+           (vars (subseq l 0 dp))
+           (type (when dp (nth (1+ dp) l))))
+      ;; everything before the hyphen (if there is one)
+      ;; must be a PDDL variable name
+      (unless
+        (every #'pddl-var-p vars)
+        (return nil))
+      (when type
+        (unless (symbolp type)
+          (return nil)))
+      (setf l
+            (when dp
+              (subseq l (+ dp 2))))
+      (finally (return t)))))
+
+(defun pddl-var-p (x)
+  (and x (symbolp x)
+       (eql #\? (aref (symbol-name x) 0))))
 
 ;;;---------------------------------------------------------------------------
 ;;; Pretty-print table entries
@@ -137,7 +164,8 @@ in the form of a list of actions."
 (set-pprint-dispatch '(cons (member :requirements))
                      #'(lambda (str obj)
                          (pprint-logical-block (str obj)
-                           (format str "(:REQUIREMENTS ~{~W~^ ~_~})"
+                           (format str "(~s ~{~W~^ ~_~})"
+                                   (first obj)
                                    (rest obj))))
                      0
                      *pddl-pprint-dispatch*)

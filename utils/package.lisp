@@ -65,14 +65,16 @@
    #:problem-objects
    #:problem-state
    #:problem-goal
+   #:problem-requirements
    #:domain-predicates
    #:domain-reqs
+   #:domain-requirements
    #:domain-types
    #:domain-functions
    #:domain-actions
    #:domain-constants
    #:action-precondition
-   #:action-effects
+   #:action-effect
    #:action-name
    #:action-params
 
@@ -110,6 +112,8 @@
    #:print-pddl-plan
    #:read-pddl-plan
    #:read-pddl-plan-file
+   #:pddlify
+   #:pddlify-tree
 
    ;; types
    #:action
