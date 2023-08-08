@@ -20,7 +20,7 @@
     :components ((:file "json")))
 
 (defsystem :hddl-to-json/tests
-  :depends-on (hddl-to-json fiveam)
+  :depends-on (hddl-to-json fiveam cl-ppcre)
   :defsystem-depends-on (fiveam-asdf)
   :serial t
   :class :fiveam-tester-system

@@ -75,21 +75,49 @@
                  '(OR)
                  str)))))
 
-(defun binary-present-p (binary)
+(defun binary-present-p (binary &optional (error-p t))
   (multiple-value-bind (output error-output success)
       (uiop:run-program (list "/usr/bin/which" binary)
                         :ignore-error-status t
                         :output :string :error-output :output)
     (declare (ignore error-output))
     (or (zerop success)
+        (null error-p)
         (progn (cerror "Install binary and retry" "Unable to find JSON manipulating binary \"~a\" in PATH.~%Output: ~a" binary output)
                t))))
 
+(defvar *have-json-binaries* nil)
+
 (defmacro with-json-binaries (&rest body)
-  `(when (and
-          (binary-present-p "yq")
-          (binary-present-p "check-jsonschema"))
+  `(when (or *have-json-binaries*
+             (and
+              (binary-present-p "yq")
+              (binary-present-p "check-jsonschema")))
+     (setf *have-json-binaries* t)
      ,@body))
+
+(defun yq-command ()
+  (when (binary-present-p "yq")
+    (let ((version-string (uiop:run-program (list "yq" "--version") :output :string))
+          major-version-number)
+      (multiple-value-bind (success matches)
+          (cl-ppcre:scan-to-strings "yq +([^0-9]+)([0-9]+)" version-string)
+        (unless success (error "Failed to extract version number from \"~a\"" version-string))
+        (setf major-version-number (parse-integer (aref matches 1) :junk-allowed t))
+        (ecase major-version-number
+          (3 (list "yq" "."))
+          (4 (list "yq" "--input-format" "yaml" "--output-format" "json"
+                   "--exit-status")))))))
+
+(defun yaml-to-json (input-file output-file)
+  (let ((input-file (if (pathnamep input-file) (namestring input-file) input-file))
+        (output-file (if (pathnamep output-file) (namestring output-file) output-file))
+        (yq-command (yq-command)))
+    (uiop:run-program (append yq-command (list input-file))
+                                   :output output-file
+                                   :error-output :string
+                                   :ignore-error-status t)))
+
 
 (test validate-domain
   (with-json-binaries
@@ -105,12 +133,8 @@
          (uiop:with-temporary-file (:pathname schema-file :prefix "domain-schema")
            (let ((schema-filename (namestring schema-file)))
              (multiple-value-bind (ignore error-output success)
-                 (uiop:run-program (list "yq" "--input-format" "yaml" "--output-format" "json"
-                                         "--exit-status"
-                                         (namestring (asdf:system-relative-pathname "hddl-to-json" "json-schemas/domain.yaml")))
-                                   :output schema-file
-                                   :error-output :string
-                                   :ignore-error-status t)
+                  (yaml-to-json (namestring (asdf:system-relative-pathname "hddl-to-json" "json-schemas/domain.yaml"))
+                                schema-file)
                (declare (ignore ignore))
                (is (zerop success))
                (unless (zerop success)
@@ -141,12 +165,8 @@
             (uiop:with-temporary-file (:pathname schema-file :prefix "problem-schema")
               (let ((schema-filename (namestring schema-file)))
                 (multiple-value-bind (ignore error-output success)
-                    (uiop:run-program (list "yq" "--input-format" "yaml" "--output-format" "json"
-                                            "--exit-status"
-                                            (namestring (asdf:system-relative-pathname "hddl-to-json" "json-schemas/problem.yaml")))
-                                      :output schema-file
-                                      :error-output :string
-                                      :ignore-error-status t)
+                    (yaml-to-json (namestring (asdf:system-relative-pathname "hddl-to-json" "json-schemas/problem.yaml"))
+                                schema-file)
                   (declare (ignore ignore))
                   (unless (zerop success)
                     (format t "~&Exit code ~d for writing JSON schema in ~a~%. Error output: ~a~%"
