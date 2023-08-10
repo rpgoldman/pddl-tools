@@ -218,4 +218,10 @@
           *airport-action-list*)))
 
 
-
+(test flatten-conjunction
+  (is
+   (equalp *conjunction*
+           (flatten-conjunction *conjunction*)))
+  (is
+   (equalp *flattened-nested-conjunction*
+           (flatten-conjunction *nested-conjunction*))))

@@ -1,7 +1,11 @@
-(in-package :pddl)
+(in-package :pddl-utils-tests)
 
-(cl:defparameter pddl-utils-tests::*pddl-keywords*
-  '(:adl :strips 
+(defmacro def-pddl-data (varname sexp)
+  `(defparameter ,varname
+     (pddlify-tree ',sexp)))
+
+(def-pddl-data pddl-utils-tests::*pddl-keywords*
+  (:adl :strips 
     :typing 
     :negative-preconditions
     :disjunctive-preconditions
@@ -18,8 +22,8 @@
     :continuous-effects))
 
 
-(cl:defparameter pddl-utils-tests::*p01-state*
-  '(
+(def-pddl-data pddl-utils-tests::*p01-state*
+  (
 
     (at-segment airplane_CFBEG seg_rw_0_400)
 
@@ -107,8 +111,8 @@
     (occupied seg_rw_0_400)
     ))
 
-(cl:defparameter pddl-utils-tests::*substituted-p01-state*
-  '(
+(def-pddl-data pddl-utils-tests::*substituted-p01-state*
+  (
 
     (at-segment ga1 seg_rw_0_400)
 
@@ -196,8 +200,8 @@
     (occupied seg_rw_0_400)
     ))
 
-(cl:defparameter pddl-utils-tests::*actionless-domain*
-  '(define (domain airport)
+(def-pddl-data pddl-utils-tests::*actionless-domain*
+  (define (domain airport)
     (:requirements :adl)
 
     (:types segment direction airplanetype - object
@@ -226,8 +230,8 @@
      )
     ))
 
-(cl:defparameter pddl-utils-tests::*airport-action-list*
-  '((:action move
+(def-pddl-data pddl-utils-tests::*airport-action-list*
+  ((:action move
  :parameters
      (?a - airplane ?t - airplanetype ?d1 - direction ?s1 ?s2  - segment ?d2 - direction)
  :precondition
@@ -353,3 +357,23 @@
               (is-moving ?a) )
 )
 ))
+
+(def-pddl-data *conjunction*
+  (and
+    (not (at ?l1))
+    (at ?l2)))
+
+(def-pddl-data *nested-conjunction*
+  (and
+    (and
+      (at ?l1)
+      (not (toll-area ?l1))
+      (road ?l1 ?l2))
+    (l10-0)))
+
+(def-pddl-data *flattened-nested-conjunction*
+  (and
+    (at ?l1)
+    (not (toll-area ?l1))
+    (road ?l1 ?l2)
+    (l10-0)))
