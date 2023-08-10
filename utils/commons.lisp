@@ -595,18 +595,20 @@ Translates to (constant . type) alist."
 (defun flatten-conjunction (conj)
   "Take an s-expression and, if it is a multilayer conjunction,
 make it a single-layer conjunction (intermediate AND's removed)."
-  (labels ((flatten-1 (conj)
+  (labels ((flatten-conj-list (cl)
+             (alexandria:mappend #'flatten-1 cl))
+           (flatten-1 (conj)
              ;; return the conj with any outside AND removed and
              ;; flattened
              (case (first conj)
-               (and (alexandria:mappend #'flatten-1 (rest conj)))
+               (and (flatten-conj-list (rest conj)))
                ((or forall exists imply) (error "Cannot handle a disjunction in FLATTEN-CONJUNCTION:~%~t~s" conj))
                (not (assert (= (length conj) 2))
                 (if (positive-literal-p (second conj))
-                    conj
+                    (list conj)
                     (error "Cannot handle negations other than negated literals in flatten-conjunction: ~s"
                            conj)))
                (otherwise (list conj)))))
     (if (eq (first conj) 'and)
-        `(and ,@ (flatten-1 conj))
+        `(and ,@ (flatten-conj-list (rest conj)))
         (flatten-1 conj))))
