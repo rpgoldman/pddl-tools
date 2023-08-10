@@ -181,6 +181,14 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
   `(setf (getf ,method :precondition) ,precondition))
 
 
+(defsetf problem-domain (problem) (domain)
+  `(let ((*pddl-package* *hddl-package*))
+     (assert (pddl-utils::problem-p ,problem))
+     (setf (pddl-utils:problem-domain ,problem) ,domain)))
+
+(defun problem-domain (problem)
+  (pddl-utils:problem-domain problem))
+
 (defun problem-htn (problem)
   (problem-element problem :htn))
 

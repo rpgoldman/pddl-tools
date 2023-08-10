@@ -39,6 +39,7 @@
            #:domain-predicates
            #:make-domain #:make-problem
            #:canonicalize-domain
+           #:problem-domain
            #:problem-goal
            #:problem-state)
   (:reexport :pddl-utils :hddl-pprinter)
@@ -94,5 +95,3 @@
    #:hddl-problem-to-pddl-problem
    )
 )
-
-
