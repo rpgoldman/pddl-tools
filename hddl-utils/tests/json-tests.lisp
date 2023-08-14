@@ -2,11 +2,15 @@
 
 (defpackage hddl-json-tests
   (:use common-lisp iterate alexandria cl-json fiveam)
+  (:import-from hddl-utils #:hddlify-tree)
   (:import-from hddl-json
                 #:json-dump-domain
                 #:json-dump-problem
                 #:json-dump-atom
-                #:json-dump-task))
+                #:json-dump-goal
+                #:json-dump-quantified
+                #:json-dump-task
+                #:json-dump-htn))
 
 (in-package :hddl-json-tests)
 
@@ -74,6 +78,25 @@
                 (hddl-json::json-dump-goal
                  '(OR)
                  str)))))
+
+(test serialize-quantifications
+  (let ((prop (hddlify-tree '(forall (?pos - location) (not (mouse-at ?pos)))))
+        (quant-string "{\"op\":\"forall\",\"boundVars\":[{\"name\":\"?pos\",\"type\":\"location\"}],\"operand\":{\"op\":\"not\",\"operand\":{\"predicate\":\"mouse-at\",\"args\":[\"?pos\"]}}}"))
+    (is (equalp quant-string
+                (with-output-to-string (str)
+                  (json-dump-quantified prop str))))
+        (is (equalp quant-string
+                (with-output-to-string (str)
+                  (json-dump-goal prop str))))
+    (is (equalp
+         "{\"name\":\"hunt_done\",\"parameters\":[],\"task\":{\"taskName\":\"hunt\",\"args\":[]},\"precondition\":{\"op\":\"forall\",\"boundVars\":[{\"name\":\"?pos\",\"type\":\"location\"}],\"operand\":{\"op\":\"not\",\"operand\":{\"predicate\":\"mouse-at\",\"args\":[\"?pos\"]}}},\"taskNetwork\":{\"orderedSubtasks\":[{\"taskName\":\"nil\",\"args\":[]}]}}"
+         (with-output-to-string (str)
+          (hddl-to-json::json-dump-method (hddlify-tree '(:method hunt_done
+                                                          :parameters ()
+                                                          :task (hunt)
+                                                          :precondition (forall (?pos - location) (not (mouse-at ?pos)))
+                                                          :ordered-subtasks ()))
+                                          str))))))
 
 (defun binary-present-p (binary &optional (error-p t))
   (multiple-value-bind (output error-output success)
@@ -182,3 +205,31 @@
                     (format t "~&Exit code ~d for validating JSON against schema in ~a~%Error output:~%~a~%"
                             success schema-filename output)
                     (return-from test-block nil))))))))))
+
+(test dump-task-net
+  ;;; Test for problem processing a task network that's only a single subtask
+  ;;; i.e., no leading AND.
+  (let ((problem-htn '(:ORDERED-SUBTASKS (SIFT-HDDL::HUNT))))
+    (is (equalp "{\"parameters\":[],\"orderedSubtasks\":[{\"taskName\":\"hunt\",\"args\":[]}]}"
+                (with-output-to-string (str)
+                  (json-dump-htn problem-htn str)))))
+  (let ((method-def '(:METHOD SIFT-HDDL::MOVE-SHORT-SNAKE :PARAMETERS
+                      (SIFT-HDDL::?SNAKE - SIFT-HDDL::SNAKE SIFT-HDDL::?SNAKEPOS
+                       SIFT-HDDL::?GOALPOS SIFT-HDDL::?POS2 - SIFT-HDDL::LOCATION)
+                      :TASK
+                      (SIFT-HDDL::MOVE SIFT-HDDL::?SNAKE SIFT-HDDL::?SNAKEPOS
+                       SIFT-HDDL::?GOALPOS)
+                      :PRECONDITION
+                      (AND (SIFT-HDDL::ADJACENT SIFT-HDDL::?POS2 SIFT-HDDL::?SNAKEPOS)
+                       (NOT (SIFT-HDDL::OCCUPIED SIFT-HDDL::?POS2))
+                       (SIFT-HDDL::TAIL SIFT-HDDL::?SNAKE SIFT-HDDL::?SNAKEPOS))
+                      :ORDERED-SUBTASKS
+                      (AND (SIFT-HDDL::MOVE-SHORT SIFT-HDDL::?SNAKE SIFT-HDDL::?POS2
+                            SIFT-HDDL::?SNAKEPOS)
+                       (SIFT-HDDL::MOVE SIFT-HDDL::?SNAKE SIFT-HDDL::?POS2
+                        SIFT-HDDL::?GOALPOS)))))
+    (is (equalp "{\"parameters\":[],\"orderedSubtasks\":[{\"taskName\":\"move-short\",\"args\":[\"?snake\",\"?pos2\",\"?snakepos\"]},{\"taskName\":\"move\",\"args\":[\"?snake\",\"?pos2\",\"?goalpos\"]}]}"
+                (with-output-to-string (str)
+                  (json-dump-htn (member :ordered-subtasks method-def) str))))))
+
+

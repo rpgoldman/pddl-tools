@@ -1,6 +1,23 @@
+;;;---------------------------------------------------------------------------
+;;; Copyright (c) 2023 Smart Information Flow Technologies, d/b/a SIFT, LLC
+;;; and Robert P. Goldman
+;;; All rights reserved.
+;;;
+;;;---------------------------------------------------------------------------
+;;; File Description:  Code to serialize HDDL domain and problem files as
+;;; JSON using the schemas attached to this library.
+;;;
+;;;
+;;;---------------------------------------------------------------------------
+
+
 (defpackage hddl-json
   (:use common-lisp hddl-utils cl-json iterate)
-  (:export #:json-dump-domain
+  (:nicknames #:hddl-to-json)
+  (:import-from hddl
+                #:forall #:exists #:imply)
+  (:export #:hddl-to-json
+           #:json-dump-domain
            #:json-dump-problem))
 
 (in-package :hddl-json)
@@ -13,6 +30,12 @@
 (defparameter +domain-schema+ "https://www.sift.net/hddl/draft/2023-07-31/domain")
 (defparameter +problem-schema+ "https://www.sift.net/hddl/draft/2023-07-31/problem")
 
+(defun hddl-to-json (&optional (input-stream *standard-input*)
+                       (output-stream *standard-output*))
+  (let ((hddl-entity (hddl-io:read-hddl-stream input-stream)))
+    (etypecase hddl-entity
+      (hddl:domain (json-dump-domain hddl-entity output-stream))
+      (hddl:problem (json-dump-problem hddl-entity output-stream)))))
 
 ;;; When encoding a symbol, use the normal camel case output for
 ;;; keys in dictionaries, but simply downcase symbols for values
@@ -267,7 +290,7 @@ with \"taskName\" and \"args\" (array) components."
      (encode-object-member :op (first goal))
      (as-object-member (:bound-vars)
        (json-dump-typelist (second goal) stream))
-     (as-object-member (:expr)
+     (as-object-member (:operand)
        (json-dump-goal (third goal))))))
 
 (defun json-dump-effect (effect &optional (stream *json-output*))
@@ -333,9 +356,12 @@ with \"taskName\" and \"args\" (array) components."
     (flet ((dump-subtasks ()
              (as-object-member (:ordered-subtasks)
                (with-array ()
-                 (dolist (x (rest (pddl-utils::flatten-conjunction subtask-conj)))
-                   (as-array-member ()
-                     (json-dump-task x stream)))))))
+                 (let ((flattened (pddl-utils::flatten-conjunction subtask-conj)))
+                   (when (eq (first flattened) 'and)
+                     (setf flattened (rest flattened)))
+                   (dolist (x flattened)
+                     (as-array-member ()
+                       (json-dump-task x stream))))))))
       (if as-object
           (with-object ()
             (dump-subtasks))

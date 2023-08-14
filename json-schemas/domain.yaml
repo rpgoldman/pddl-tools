@@ -191,12 +191,12 @@ $defs:
           - exists
       boundVars:
         $ref: "#/$defs/typelist"
-      effect:
+      operand:
         $ref: "#/$defs/goal"
     required:
       - op
       - boundVars
-      - effect
+      - operand
 
   action:
     type: object
