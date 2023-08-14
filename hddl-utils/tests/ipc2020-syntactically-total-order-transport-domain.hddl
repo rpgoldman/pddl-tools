@@ -63,7 +63,7 @@
 		:parameters (?l1 - location ?l2 - location ?v - vehicle)
 		:task (get_to ?v ?l2)
 		:ordered-subtasks 
-		 (task0 (drive ?v ?l1 ?l2))
+		 (drive ?v ?l1 ?l2)
 	)
 
 	(:method m_drive_to_via_ordering_0
