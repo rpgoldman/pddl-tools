@@ -1,0 +1,28 @@
+#!/bin/bash
+
+ASDF_DIR=${ASDF_DIR:-${HOME}/lisp/asdf/build}
+THIS_DIR=$(realpath $(dirname ${BASH_SOURCE}))
+QUICKLISP_DIR=${QUICKLISP_DIR:-~/quicklisp}
+
+sbcl --no-userinit --no-sysinit --non-interactive \
+     --load "${ASDF_DIR}/asdf.lisp" \
+     --load  ${QUICKLISP_DIR}/setup.lisp \
+     --eval '(ql:quickload "cl-json")' \
+     --eval '(ql:quickload "iterate")' \
+     --eval '(ql:quickload "fiveam-asdf")' \
+     --eval '(ql:quickload "alexandria")' \
+     --eval '(ql:write-asdf-manifest-file "/tmp/quicklisp-manifest.txt")'
+
+
+buildapp --output hddl-to-json --entry main \
+         --manifest-file /tmp/quicklisp-manifest.txt \
+         --load "${ASDF_DIR}/asdf.lisp" \
+         --asdf-path "${THIS_DIR}/" \
+         --load-system "hddl-to-json" \
+         --load "${THIS_DIR}/hddl-to-json-entrypoint.lisp" \
+         --logfile '/tmp/hddl-to-json-buildapp.out'
+
+
+# Local Variables:
+# mode: sh
+# End:

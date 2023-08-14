@@ -46,9 +46,14 @@ FOO BAR - TYPE1 BAZ - TYPE2."
 
 (defun read-hddl-file (dom-prob-file)
   "Takes a domain or problem file and returns its s-expression."
+  (with-open-file (dom-prob dom-prob-file :direction :input)
+    (read-hddl-stream dom-prob)))
+
+(defun read-hddl-stream (stream)
+  "Takes a domain or problem file and returns its s-expression."
   (let ((*package* (find-package *hddl-package*)))
-    (with-open-file (dom-prob dom-prob-file :direction :input)
-      (read dom-prob nil nil))))
+    (read stream nil nil)))
+
 
 #|
 

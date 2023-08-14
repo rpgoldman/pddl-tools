@@ -68,6 +68,7 @@
                 )
   (:export #:pprint-hddl
            #:read-hddl-file
+           #:read-hddl-stream
            #:read-hddl-plan
            #:read-hddl-plan-file
            #:hddl-symbol
