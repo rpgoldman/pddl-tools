@@ -581,9 +581,10 @@ their typing information removed."
 (defun typelist-to-alist (typed-list)
   "TYPED-LIST must be a canonical-form typed list (see CANONICALIZE-TYPE-LIST).
 Translates to (constant . type) alist."
-  (iterate (for (constant dash type . nil) on typed-list by 'cdddr)
-    (assert (eq dash '-))
-    (collecting (cons constant type))))
+  (let ((type-list (canonicalize-types typed-list)))
+    (iterate (for (constant dash type . nil) on type-list by 'cdddr)
+      (assert (eq dash '-))
+      (collecting (cons constant type)))))
 
 (defun positive-literal-p (sexp &key (predicates nil predicates-supplied-p))
   (and (listp sexp)
