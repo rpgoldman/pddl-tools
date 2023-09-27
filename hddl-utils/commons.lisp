@@ -74,12 +74,21 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
                 "Some duplicated facts in init.  This is known to break some planners.")
         (setf init (remove-duplicates init :test 'equal)))
       `(,(pddl-symbol 'pddl:define) (,(pddl-symbol 'pddl:problem) ,(hddl-symbol name))
-           (:domain ,domain)
-         ,@(when requirements
-                `((:requirements ,@requirements)))
-         (:objects ,@objects)
-         (:init ,@init)
-         (:goal ,goal)))))
+        (:domain ,domain)
+        ,@(when requirements
+            `((:requirements ,@requirements)))
+        (:objects ,@objects)
+        (:init ,@init)
+        (:goal ,goal)))))
+
+(defun canonicalize-problem (problem)
+  (make-problem (problem-name problem)
+                :requirements (problem-requirements problem)
+                :domain (problem-domain problem)
+                :objects (problem-objects problem)
+                :init (problem-state problem)
+                :goal (problem-goal problem)
+                :htn (problem-htn problem)))
 
 
 ;;; misc utility
