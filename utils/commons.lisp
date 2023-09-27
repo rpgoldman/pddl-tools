@@ -48,6 +48,18 @@
                        problem)))
     (rest head)))
 
+(defsetf problem-element (problem pddl-keyword) (new-element)
+  (let ((cell-var (gensym)))
+    `(progn
+       (assert (problem-p ,problem))
+       (alexandria:if-let ((,cell-var (find-if #'(lambda(e)
+                                     (and (listp e) (eq (car e) ,pddl-keyword)))
+                                 ,problem)))
+         (setf (cdr ,cell-var) ,new-element)
+         (nconc ,problem (quote ((,pddl-keyword ,@new-element))))
+         ,new-element))))
+
+
 ;; Getter/setter functions for PDDL expressions:
 (defun domain-element (domain-expr pddl-keyword)
   (assert (domain-p domain-expr))
