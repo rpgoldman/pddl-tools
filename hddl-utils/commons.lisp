@@ -54,7 +54,8 @@
              :actions actions)))
 
 (defun make-problem (name &key requirements domain objects init goal
-                     (complete-p t))
+                            htn
+                            (complete-p t))
   "Make a new PDDL problem s-expression initialized as per the keyword
 arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
   (when complete-p
@@ -63,6 +64,7 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
   (flet ((negated (fact) (eq (first fact) 'not)))
     (let ((domain (hddl-symbol domain))
           (objects (hddlify-tree objects))
+          (htn (hddlify-tree htn))
           (init (hddlify-tree init))
           (goal (hddlify-tree goal)))
       (when (some #'negated init)
@@ -74,12 +76,22 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
                 "Some duplicated facts in init.  This is known to break some planners.")
         (setf init (remove-duplicates init :test 'equal)))
       `(,(pddl-symbol 'pddl:define) (,(pddl-symbol 'pddl:problem) ,(hddl-symbol name))
-           (:domain ,domain)
-         ,@(when requirements
-                `((:requirements ,@requirements)))
-         (:objects ,@objects)
-         (:init ,@init)
-         (:goal ,goal)))))
+        (:domain ,domain)
+        ,@(when requirements
+            `((:requirements ,@requirements)))
+        (:objects ,@objects)
+        (:init ,@init)
+        (:htn ,@htn)
+        (:goal ,goal)))))
+
+(defun canonicalize-problem (problem)
+  (make-problem (problem-name problem)
+                :requirements (problem-requirements problem)
+                :domain (problem-domain problem)
+                :objects (problem-objects problem)
+                :init (problem-state problem)
+                :goal (problem-goal problem)
+                :htn (problem-htn problem)))
 
 
 ;;; misc utility
@@ -191,6 +203,13 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
 
 (defun problem-htn (problem)
   (problem-element problem :htn))
+
+(defsetf problem-htn (problem) (&rest htn)
+  `(let ((*pddl-package* hddl-io::*hddl-package*))
+
+     (setf (pddl-utils:problem-element ,problem :htn)
+           (hddlify-tree ,htn))))
+
 
 (defun domain-tasks (domain)
   (check-type domain domain)
