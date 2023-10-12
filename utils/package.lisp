@@ -119,6 +119,7 @@
    #:action
    #:domain
    #:problem
+   #:pddl-variable
 
    ;; constructor macros
    #:with-problem
@@ -130,5 +131,3 @@
    #:make-inst
    #:add-fact
    ))
-
-

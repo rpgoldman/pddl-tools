@@ -14,6 +14,12 @@
 (deftype action ()
   `(and list (satisfies action-sexp-p)))
 
+(deftype pddl-variable ()
+  `(and symbol (satisfies question-mark-prefix-p)))
+
+(defun question-mark-prefix-p (sym)
+  (eql #\? (aref (symbol-name sym) 0)))
+
 
 (defun domain-p (x)
   (typep x 'domain))

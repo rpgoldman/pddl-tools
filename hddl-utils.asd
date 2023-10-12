@@ -18,9 +18,7 @@
     :components ((:file "package")      ; Package definition.
                  (:file "decls" :depends-on ("package"))
                  (:file "commons" :depends-on ("package" "decls"))
-                 #+nil(:file "merger" :depends-on ("package"))
-                 #+nil(:file "problem-macros" :depends-on ("package"))
-;                 (:file "object-methods" :depends-on ("package" "decls"))
+                 (:file "hddl-checker" :depends-on ("commons"))
                  ))
 
 
