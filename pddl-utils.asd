@@ -30,12 +30,7 @@
   :version (:read-file-form "version.lisp-expr")
   :serial t
   :class :fiveam-tester-system
-  :test-names ((#:problem-acc . :pddl-utils-tests)
-               (#:domain-acc . :pddl-utils-tests)
-               (#:domain-well-defined-p . :pddl-utils-tests)
-               (#:predicate-definitions-correct-p . :pddl-utils-tests)
-               (#:predicate-DONE-member-p . :pddl-utils-tests)
-               (#:types-correct-p . :pddl-utils-tests)
+  :test-names ((#:pddl-utils-tests . :pddl-utils-tests)
                )
   :pathname "utils/tests/"
   :components ((:file "package")

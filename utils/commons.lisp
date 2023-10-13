@@ -611,9 +611,10 @@ Translates to (constant . type) alist."
            (member (first sexp) predicates)
            t)))
 
-(defun flatten-conjunction (conj)
-  "Take an s-expression and, if it is a multilayer conjunction,
-make it a single-layer conjunction (intermediate AND's removed)."
+(defun flatten-conjunction (conj &optional (strict t))
+  "Take an s-expression and, if it is a multilayer conjunction.
+Returns a single-layer conjunction (intermediate AND's, if any,
+removed)."
   (labels ((flatten-conj-list (cl)
              (alexandria:mappend #'flatten-1 cl))
            (flatten-1 (conj)
@@ -628,6 +629,10 @@ make it a single-layer conjunction (intermediate AND's removed)."
                     (error "Cannot handle negations other than negated literals in flatten-conjunction: ~s"
                            conj)))
                (otherwise (list conj)))))
-    (if (eq (first conj) 'and)
-        `(and ,@ (flatten-conj-list (rest conj)))
-        (flatten-1 conj))))
+    (cond ((eq (first conj) 'and)
+           `(and ,@(flatten-conj-list (rest conj))))
+          (strict (error "FLATTEN-CONJUNCTION expects a conjunction as input, not an implicit conjunction."))
+          (t
+           ;; in this case we have an implicit conjunction with no initial 'and
+           ;; supply one.
+           `(and ,@(flatten-conj-list conj))))))

@@ -220,7 +220,7 @@ including :task, :method, :action, :type, :predicate, :object"
     (unless (eq hyphen '-)
       (error "Ill-formed constant definition: ~a" `(,name ,hyphen ,type)))
     (set-name-type (domain-info name "constant definitions") :object)
-    (verify-type-name domain-info type "constant definitions"))))
+    (verify-type-name domain-info type "constant definitions")))
 
 (defun check-objects (domain-info objects)
   (iter (for (name hyphen type . rest) on objects by 'cdddr)
@@ -228,7 +228,7 @@ including :task, :method, :action, :type, :predicate, :object"
     (unless (eq hyphen '-)
       (error "Ill-formed constant definition: ~a" `(,name ,hyphen ,type)))
     (set-name-type (domain-info name "problem object definitions") :object)
-    (verify-type-name domain-info type "problem object definitions"))))
+    (verify-type-name domain-info type "problem object definitions")))
 
 (defun check-initial-state (domain-info facts)
   (iter (for fact in facts)
@@ -277,7 +277,9 @@ Return the arity of the parameter list."
     (assert (eq keyword :method))
     (verify-task-name domain-info task-name (format nil "method task for definition of method ~a" name))
     (set-name-type (domain-info name (format nil "method definition of method named ~a" name)) :method)
-    (check-method-subtasks domain-info (rest (flatten-conjunction (method-subtasks method)))
+    (check-method-subtasks domain-info
+                           ;; this way puts subtasks in flattened-conj form and then takes the list of subtasks
+                           (rest (flatten-conjunction (method-subtasks method) nil))
                            (format nil "Subtasks of method ~a" name))))
 
 (defun check-method-subtasks (domain-info subtasks &optional context)
