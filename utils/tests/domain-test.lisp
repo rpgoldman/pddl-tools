@@ -221,13 +221,18 @@
 
 
 (test flatten-conjunction
-  (is
-   (equalp *conjunction*
-           (flatten-conjunction *conjunction*)))
-  (is
-   (equalp *flattened-nested-conjunction*
-           (flatten-conjunction *nested-conjunction*)))
-  (is (equalp *conjunction*
-              (flatten-conjunction (rest *conjunction*) nil)))
-  ;; check strict mode
-  (signals error (flatten-conjunction (rest *conjunction*) t)))
+      (is
+       (equalp *conjunction*
+               (flatten-conjunction *conjunction*)))
+      (is
+       (equalp *flattened-nested-conjunction*
+               (flatten-conjunction *nested-conjunction*)))
+      (is (equalp *conjunction*
+                  (flatten-conjunction (rest *conjunction*) nil)))
+      (is (equalp '(and) (flatten-conjunction nil nil)))
+      (is (equalp '(and (hunt snark))
+                  (flatten-conjunction '(hunt snark) nil)))
+      ;; check strict mode
+      (signals error (flatten-conjunction '(hunt snark) t))
+      (signals error (flatten-conjunction (rest *conjunction*) t))
+      )

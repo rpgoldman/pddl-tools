@@ -359,11 +359,11 @@ Return the arity of the parameter list."
                           (only-value symbol))
                 name-type))
 (defun name-type (domain-info name)
-  (the symbol (gethash name (name-types domain-info))))
+  (nth-value 0 (the (only-values symbol boolean) (gethash name (name-types domain-info)))))
 
 (defun set-name-type-fun (domain-info name context type)
   (with-slots (name-types) domain-info
-    (if-let ((prev-type (the symbol (name-type domain-info name))))
+    (if-let ((prev-type (the symbol  (name-type domain-info name))))
       (unless (eq type prev-type)
         (restart-case
             (signal 'inconsistent-name-type
@@ -380,7 +380,7 @@ Return the arity of the parameter list."
                           (only-value (integer 0)))
                 name-arity))
 (defun name-arity (domain-info name)
-  (the (or null (integer 0)) (gethash name (name-arities domain-info))))
+  (the (or null (integer 0)) (nth-value 0 (gethash name (name-arities domain-info)))))
 
 (defun set-name-arity-fun (domain-info name context arity)
   (with-slots (name-types) domain-info

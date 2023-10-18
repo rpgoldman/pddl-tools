@@ -614,7 +614,11 @@ Translates to (constant . type) alist."
 (defun flatten-conjunction (conj &optional (strict t))
   "Take an s-expression and, if it is a multilayer conjunction.
 Returns a single-layer conjunction (intermediate AND's, if any,
-removed)."
+removed).
+  Special cases:
+  1. NIL should yield (AND)
+  2. Simple proposition (<pred> <arg>*) should be wrapped in AND as
+     (AND (<pred> <arg>*))"
   (labels ((flatten-conj-list (cl)
              (alexandria:mappend #'flatten-1 cl))
            (flatten-1 (conj)
@@ -631,6 +635,11 @@ removed)."
                (otherwise (list conj)))))
     (cond ((eq (first conj) 'and)
            `(and ,@(flatten-conj-list (rest conj))))
+          ;; just a single proposition/conjunct
+          ((and (first conj) (symbolp (first conj)))
+           (if strict
+               (error "FLATTEN-CONJUNCTION expects a conjunction, but got a proposition: ~s" conj)
+               `(and ,conj)))
           (strict (error "FLATTEN-CONJUNCTION expects a conjunction as input, not an implicit conjunction."))
           (t
            ;; in this case we have an implicit conjunction with no initial 'and

@@ -14,8 +14,9 @@
 (defpackage hddl-json
   (:use common-lisp hddl-utils cl-json iterate)
   (:nicknames #:hddl-to-json)
-  (:import-from hddl
+  (:import-from #:hddl
                 #:forall #:exists #:imply)
+  (:import-from #:pddl-utils #:flatten-conjunction)
   (:export #:hddl-to-json
            #:json-dump-domain
            #:json-dump-problem))
@@ -356,12 +357,12 @@ with \"taskName\" and \"args\" (array) components."
     (flet ((dump-subtasks ()
              (as-object-member (:ordered-subtasks)
                (with-array ()
-                 (let ((flattened (pddl-utils::flatten-conjunction subtask-conj)))
+                 (let ((flattened (flatten-conjunction subtask-conj nil)))
                    (when (eq (first flattened) 'and)
                      (setf flattened (rest flattened)))
                    (dolist (x flattened)
                      (as-array-member ()
-                       (json-dump-task x stream))))))))
+                                      (json-dump-task x stream))))))))
       (if as-object
           (with-object ()
             (dump-subtasks))
