@@ -47,7 +47,8 @@
   (:import-from :pddl-utils
                 #:action-sexp-p
                 #:has-element-p
-                #:durative-action-sexp-p)
+                #:durative-action-sexp-p
+                #:flatten-conjunction)
   #+nil (:import-from #:pddl-pprinter
                       #:complex-task-sexp-p
                       #:*pddl-package*
@@ -94,5 +95,6 @@
    #:hddl-domain-to-pddl-domain
    #:hddl-problem-to-pddl-problem
    #:canonicalize-problem
+   #:hddl-variable
    )
 )

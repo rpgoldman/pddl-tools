@@ -1,5 +1,7 @@
 (in-package :pddl-utils-tests)
 
+(def-suite* pddl-utils-tests)
+
 (defparameter *tests-dir*
   (namestring
    (translate-logical-pathname
@@ -16,10 +18,10 @@
       (if (and (not (= pos 0))
                (eql (nth (1- pos) typed-list) '-))
         ;; then the TYPE-EL is a parent type itself.
-        ;; Skip this occurrence of the symbol in the TYPED-LIST. 
+        ;; Skip this occurrence of the symbol in the TYPED-LIST.
         (problem-free-p type-el (subseq typed-list (1+ pos)))
         ;; Otherwise, TYPE-EL is a subtype so look for if we have its
-        ;; parent. 
+        ;; parent.
         (let ((next-parent-type
                (position '- (subseq typed-list (1+ pos)))))
           (if (null next-parent-type)
@@ -32,7 +34,7 @@
               (return-from problem-free-p nil))
             ;; Else there is a parent type. That's ok, but check if this
             ;; TYPE-EL belongs to another parent now...
-            (problem-free-p type-el 
+            (problem-free-p type-el
                             (subseq typed-list (1+
                                                 next-parent-type)))))))
     t))
@@ -79,14 +81,14 @@
           (read-planning-input
            (merge-pathnames "airport-nontemporal-adl-domain.pddl"
                             *tests-dir*))))
-    (setf (domain-predicates domain) 
+    (setf (domain-predicates domain)
           (append (domain-predicates domain)
                   (list '(DONE))))
     (&body)))
 
 
 (test types-correct-p
-      (with-fixture 
+      (with-fixture
           well-defined-pddl-objects ()
           ;; Check for simple subtyping -- every
           ;; type should have a parent type, except the type
@@ -95,13 +97,13 @@
                          (problem-free-p element
                                          (copy-tree (domain-types domain))))
                      (domain-types domain)))))
-                           
+
 (test predicate-definitions-correct-p
       (with-fixture
           well-defined-pddl-objects ()
           ;; Check for duplicates...
           (is (every #'(lambda (element)
-                         (let ((element-trail 
+                         (let ((element-trail
                                 (member element (domain-predicates
                                                  domain)
                                         :test #'equal)))
@@ -116,10 +118,10 @@
                       :test #'equal))))
 
 (test domain-well-defined-p
-  (with-fixture 
+  (with-fixture
       well-defined-pddl-objects ()
       (is (every #'keywordp (domain-reqs domain)))
-      (is (every #'(lambda (el) 
+      (is (every #'(lambda (el)
                      (member el *pddl-keywords* :test #'eql))
                  (domain-reqs domain)))))
 
@@ -219,9 +221,18 @@
 
 
 (test flatten-conjunction
-  (is
-   (equalp *conjunction*
-           (flatten-conjunction *conjunction*)))
-  (is
-   (equalp *flattened-nested-conjunction*
-           (flatten-conjunction *nested-conjunction*))))
+      (is
+       (equalp *conjunction*
+               (flatten-conjunction *conjunction*)))
+      (is
+       (equalp *flattened-nested-conjunction*
+               (flatten-conjunction *nested-conjunction*)))
+      (is (equalp *conjunction*
+                  (flatten-conjunction (rest *conjunction*) nil)))
+      (is (equalp '(and) (flatten-conjunction nil nil)))
+      (is (equalp '(and (hunt snark))
+                  (flatten-conjunction '(hunt snark) nil)))
+      ;; check strict mode
+      (signals error (flatten-conjunction '(hunt snark) t))
+      (signals error (flatten-conjunction (rest *conjunction*) t))
+      )

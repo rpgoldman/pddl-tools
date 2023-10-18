@@ -14,6 +14,12 @@
 (deftype action ()
   `(and list (satisfies action-sexp-p)))
 
+(deftype pddl-variable ()
+  `(and symbol (satisfies question-mark-prefix-p)))
+
+(defun question-mark-prefix-p (sym)
+  (eql #\? (aref (symbol-name sym) 0)))
+
 
 (defun domain-p (x)
   (typep x 'domain))
@@ -605,9 +611,14 @@ Translates to (constant . type) alist."
            (member (first sexp) predicates)
            t)))
 
-(defun flatten-conjunction (conj)
-  "Take an s-expression and, if it is a multilayer conjunction,
-make it a single-layer conjunction (intermediate AND's removed)."
+(defun flatten-conjunction (conj &optional (strict t))
+  "Take an s-expression and, if it is a multilayer conjunction.
+Returns a single-layer conjunction (intermediate AND's, if any,
+removed).
+  Special cases:
+  1. NIL should yield (AND)
+  2. Simple proposition (<pred> <arg>*) should be wrapped in AND as
+     (AND (<pred> <arg>*))"
   (labels ((flatten-conj-list (cl)
              (alexandria:mappend #'flatten-1 cl))
            (flatten-1 (conj)
@@ -622,6 +633,15 @@ make it a single-layer conjunction (intermediate AND's removed)."
                     (error "Cannot handle negations other than negated literals in flatten-conjunction: ~s"
                            conj)))
                (otherwise (list conj)))))
-    (if (eq (first conj) 'and)
-        `(and ,@ (flatten-conj-list (rest conj)))
-        (flatten-1 conj))))
+    (cond ((eq (first conj) 'and)
+           `(and ,@(flatten-conj-list (rest conj))))
+          ;; just a single proposition/conjunct
+          ((and (first conj) (symbolp (first conj)))
+           (if strict
+               (error "FLATTEN-CONJUNCTION expects a conjunction, but got a proposition: ~s" conj)
+               `(and ,conj)))
+          (strict (error "FLATTEN-CONJUNCTION expects a conjunction as input, not an implicit conjunction."))
+          (t
+           ;; in this case we have an implicit conjunction with no initial 'and
+           ;; supply one.
+           `(and ,@(flatten-conj-list conj))))))

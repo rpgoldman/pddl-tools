@@ -296,4 +296,3 @@ in the form of a list of actions."
                                (print-object obj str))))
                      0
                      *hddl-pprint-dispatch*)
-

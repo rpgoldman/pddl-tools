@@ -89,7 +89,7 @@
                 (with-output-to-string (str)
                   (json-dump-goal prop str))))
     (is (equalp
-         "{\"name\":\"hunt_done\",\"parameters\":[],\"task\":{\"taskName\":\"hunt\",\"args\":[]},\"precondition\":{\"op\":\"forall\",\"boundVars\":[{\"name\":\"?pos\",\"type\":\"location\"}],\"operand\":{\"op\":\"not\",\"operand\":{\"predicate\":\"mouse-at\",\"args\":[\"?pos\"]}}},\"taskNetwork\":{\"orderedSubtasks\":[{\"taskName\":\"nil\",\"args\":[]}]}}"
+         "{\"name\":\"hunt_done\",\"parameters\":[],\"task\":{\"taskName\":\"hunt\",\"args\":[]},\"precondition\":{\"op\":\"forall\",\"boundVars\":[{\"name\":\"?pos\",\"type\":\"location\"}],\"operand\":{\"op\":\"not\",\"operand\":{\"predicate\":\"mouse-at\",\"args\":[\"?pos\"]}}},\"taskNetwork\":{\"orderedSubtasks\":[]}}"
          (with-output-to-string (str)
           (hddl-to-json::json-dump-method (hddlify-tree '(:method hunt_done
                                                           :parameters ()
@@ -231,5 +231,3 @@
     (is (equalp "{\"parameters\":[],\"orderedSubtasks\":[{\"taskName\":\"move-short\",\"args\":[\"?snake\",\"?pos2\",\"?snakepos\"]},{\"taskName\":\"move\",\"args\":[\"?snake\",\"?pos2\",\"?goalpos\"]}]}"
                 (with-output-to-string (str)
                   (json-dump-htn (member :ordered-subtasks method-def) str))))))
-
-

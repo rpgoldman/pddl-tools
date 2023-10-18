@@ -41,17 +41,30 @@
         (constants
           (when (has-element-p old-domain :constants)
             (domain-constants old-domain)))
-        (methods (domain-methods old-domain))
+        (methods (mapcar #'canonicalize-method (domain-methods old-domain)))
         (tasks (domain-tasks old-domain))
         (actions (domain-actions old-domain)))
     (make-domain (domain-name old-domain)
-             :requirements requirements
-             :types types
-             :constants constants
-             :predicates predicates
-             :tasks tasks
-             :methods methods
-             :actions actions)))
+                 :requirements requirements
+                 :types types
+                 :constants constants
+                 :predicates predicates
+                 :tasks tasks
+                 :methods methods
+                 :actions actions)))
+
+(defun canonicalize-method (original)
+  (unless (or (find :ordered-subtasks original)
+              (find :ordered-tasks original))
+    (error "CANONICALIZE-METHOD does not yet support partially-ordered methods."))
+  (make-ordered-method (method-name original)
+                       (method-task original)
+                       (method-parameters original)
+                       :precond (method-precondition original)
+                       :tasks (let ((tasks (method-subtasks original)))
+                                (if (eq (first tasks) 'and)
+                                    (rest tasks)
+                                    tasks))))
 
 (defun make-problem (name &key requirements domain objects init goal
                             htn
@@ -247,6 +260,9 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
        (return subtasks))
      (finally (return nil)))
    (error "No ordered subtasks found in HTN: ~s" htn)))
+
+(deftype hddl-variable ()
+  'pddl-variable)
 
 
 ;;; helper function
