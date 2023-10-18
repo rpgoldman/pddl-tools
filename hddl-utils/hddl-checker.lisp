@@ -354,12 +354,14 @@ Return the arity of the parameter list."
       (finally (mapc #'(lambda (super-type) (verify-type-name domain-info super-type "type definition supertypes")) super-types)))))
 
 
-
+;;; Allegro doesn't seem to like the use of a defined type in a return type declaration.
+#-allegro
 (declaim (ftype (function (domain-info symbol)
                           (only-value symbol))
                 name-type))
 (defun name-type (domain-info name)
-  (nth-value 0 (the (only-values symbol boolean) (gethash name (name-types domain-info)))))
+  (nth-value 0 #-allegro(the (only-values symbol boolean) (gethash name (name-types domain-info)))
+               #+allegro (gethash name (name-types domain-info))))
 
 (defun set-name-type-fun (domain-info name context type)
   (with-slots (name-types) domain-info
@@ -376,6 +378,7 @@ Return the arity of the parameter list."
                                            :name name :prev-type prev-type :new-type type))))))
       (setf (gethash name (name-types domain-info)) type))))
 
+#-allegro
 (declaim (ftype (function (domain-info symbol)
                           (only-value (integer 0)))
                 name-arity))
