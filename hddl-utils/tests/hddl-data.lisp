@@ -57,7 +57,10 @@
   (17 (GET-TO TRUCK-0 CITY-LOC-2)
    M-DRIVE-TO 6))))
 
-#|
+(cl:defparameter hddl-utils-tests::*expected-task*
+  '(drive truck-0 city-loc-2 city-loc-1))
+
+  #|
 (cl:defparameter pddl-utils-tests::*pddl-keywords*
   '(:adl :strips
     :typing

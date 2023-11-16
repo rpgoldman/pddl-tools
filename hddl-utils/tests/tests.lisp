@@ -235,7 +235,7 @@
 
 (test check-comma-separated-task
   (let ((string "drive truck-0, city-loc-2, city-loc-1"))
-    (is (equalp HDDL::'(drive truck-0 city-loc-2 city-loc-1)
+    (is (equalp *expected-task*
                 (hddl-pprinter::comma-separated-task->sexp string)))))
 
 (test check-reading-plan-comma-separated
