@@ -220,3 +220,25 @@
     (is (equalp goal-expr (hddl-utils:problem-goal problem)))
     )
   )
+
+
+
+(test check-reading-plan
+  (let ((plan (hddl-utils:read-hddl-plan-file
+               (asdf:system-relative-pathname "hddl-utils" "hddl-utils/tests/example-plan.hddl"))))
+    (is (equalp *parsed-plan* plan))))
+
+(test check-reading-plan-sexp
+  (let ((plan (hddl-utils:read-hddl-plan-file
+               (asdf:system-relative-pathname "hddl-utils" "hddl-utils/tests/example-plan-sexp.hddl"))))
+    (is (equalp *parsed-plan* plan))))
+
+(test check-comma-separated-task
+  (let ((string "drive truck-0, city-loc-2, city-loc-1"))
+    (is (equalp HDDL::'(drive truck-0 city-loc-2 city-loc-1)
+                (hddl-pprinter::comma-separated-task->sexp string)))))
+
+(test check-reading-plan-comma-separated
+  (let ((plan (hddl-utils:read-hddl-plan-file
+               (asdf:system-relative-pathname "hddl-utils" "hddl-utils/tests/example-plan-comma-separated.hddl"))))
+    (is (equalp *parsed-plan* plan))))

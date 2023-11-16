@@ -9,16 +9,64 @@
 (cl:defparameter hddl-utils-tests::*method*
   '(:task get-to :parameters (?l - location)))
 
+(cl:defparameter hddl-utils-tests::*parsed-plan*
+  '(:HDDL-PLAN :ACTIONS
+ ((0 DRIVE TRUCK-0 CITY-LOC-2
+   CITY-LOC-1)
+  (1 PICK-UP TRUCK-0 CITY-LOC-1
+   PACKAGE-0 CAPACITY-0 CAPACITY-1)
+  (2 DRIVE TRUCK-0 CITY-LOC-1
+   CITY-LOC-0)
+  (3 DROP TRUCK-0 CITY-LOC-0
+   PACKAGE-0 CAPACITY-0 CAPACITY-1)
+  (4 DRIVE TRUCK-0 CITY-LOC-0
+   CITY-LOC-1)
+  (5 PICK-UP TRUCK-0 CITY-LOC-1
+   PACKAGE-1 CAPACITY-0 CAPACITY-1)
+  (6 DRIVE TRUCK-0 CITY-LOC-1
+   CITY-LOC-2)
+  (7 DROP TRUCK-0 CITY-LOC-2
+   PACKAGE-1 CAPACITY-0 CAPACITY-1))
+ :ROOTS (15 14) :DECOMPOSITIONS
+ ((8
+   (LOAD TRUCK-0 CITY-LOC-1
+    PACKAGE-0)
+   M-LOAD 1)
+  (9
+   (UNLOAD TRUCK-0 CITY-LOC-0
+    PACKAGE-0)
+   M-UNLOAD 3)
+  (10 (GET-TO TRUCK-0 CITY-LOC-1)
+   M-DRIVE-TO 0)
+  (11
+   (UNLOAD TRUCK-0 CITY-LOC-2
+    PACKAGE-1)
+   M-UNLOAD 7)
+  (12 (GET-TO TRUCK-0 CITY-LOC-0)
+   M-DRIVE-TO 2)
+  (13
+   (LOAD TRUCK-0 CITY-LOC-1
+    PACKAGE-1)
+   M-LOAD 5)
+  (14 (DELIVER PACKAGE-0 CITY-LOC-0)
+   M-DELIVER 10 8 12 9)
+  (15 (DELIVER PACKAGE-1 CITY-LOC-2)
+   M-DELIVER 16 13 17 11)
+  (16 (GET-TO TRUCK-0 CITY-LOC-1)
+   M-DRIVE-TO 4)
+  (17 (GET-TO TRUCK-0 CITY-LOC-2)
+   M-DRIVE-TO 6))))
+
 #|
 (cl:defparameter pddl-utils-tests::*pddl-keywords*
-  '(:adl :strips 
-    :typing 
+  '(:adl :strips
+    :typing
     :negative-preconditions
     :disjunctive-preconditions
     :equality
     :existential-preconditions
     :universal-preconditions
-    :quantified-preconditions 
+    :quantified-preconditions
     :existential-preconditions
     :universal-preconditions
     :conditional-effects
