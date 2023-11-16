@@ -80,6 +80,17 @@ in the form of a list of actions."
   (with-open-file (str filename)
     (read-HDDL-plan str)))
 
+(defun comma-separated-task->sexp (raw-string)
+  (let* ((string (string-upcase raw-string))
+         (task-name-pos (or (position #\space string)
+                            (error "Unable to parse task from \"~a\"" raw-string)))
+         (task-name (string-right-trim (list #\space) (subseq string 0 task-name-pos)))
+         (parameters
+           (mapcar #'(lambda (x) (string-right-trim (list #\space)
+                                                    (string-left-trim (list #\space) x)))
+                   (cl-ppcre:split "," string :start (1+ task-name-pos)))))
+    (mapcar #'hddl-symbol (cons task-name parameters))))
+
 (defun read-HDDL-plan (stream)
   ;; FIXME: rewrite the docstring with return value
   "Read a HDDL plan from STREAM and return it
@@ -115,11 +126,9 @@ in the form of a list of actions."
                (cons id
                 (ecase format
                   (:comma-separated
-                   (let ((components
-                           (cl-ppcre:split "," line :start (1+ pos))))
-                     (mapcar #'hddl-symbol components)))
+                   (comma-separated-task->sexp (subseq (string-upcase line) (1+ pos))))
                   (:s-expression
-                   (let ((*package* *hddl-package*))
+                   (let ((*package* (find-package *hddl-package*)))
                      (read-from-string line t nil :start (1+ pos))))
                   (:default
                    (space-separated-string->hddl-list (subseq line pos))
@@ -144,7 +153,14 @@ in the form of a list of actions."
                   (partition-method-line (subseq line (1+ pos)))
                 (declare (type string task-string method-id subtasks))
                 (collecting `(,id
-                              ,(space-separated-string->hddl-list task-string)
+                              ,(ecase format
+                                 (:default
+                                  (space-separated-string->hddl-list (string-upcase task-string)))
+                                 (:s-expression
+                                  (let ((*package* (find-package *hddl-package*)))
+                                    (read-from-string task-string)))
+                                 (:comma-separated
+                                  (comma-separated-task->sexp (string-upcase task-string))))
                               .
                               (,(intern (string-upcase method-id) *hddl-package*)
                                ,@(read-integer-list subtasks))))))))
