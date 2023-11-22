@@ -38,7 +38,7 @@
 
         (multiple-value-bind (output error-output success)
             (uiop:run-program (list "timeout"
-                                    "--signal=KILL"
+                                    ;; "--signal=KILL"
                                     (format nil "~ds" remaining-time)
                                     panda-pi-parser
                                     (namestring domain-file)
@@ -48,15 +48,18 @@
                               :error-output :output
                               :output :string)
           (declare (ignore error-output))
-          (unless (zerop success)
-            (error "Failed to parse the domain and/or problem with exit code ~d.~%Output:~%~a" success output)))
+          (cond ((= success 124)
+                 (error "Timed out while parsing the domain and/or problem"))
+                ((zerop success))
+                (t
+                 (error "Failed to parse the domain and/or problem with exit code ~d.~%Output:~%~a" success output))))
         (decf remaining-time (elapsed-seconds start-time (get-internal-run-time)))
         (when (< remaining-time 0) (error "Timeout during parsing."))
         (when verbose (format t "~&Done parsing HDDL inputs.~%"))
         (setf start-time (get-internal-run-time))
         (multiple-value-bind (output error-output success)
             (uiop:run-program (list "timeout"
-                                    "--signal=KILL"
+                                    ;; "--signal=KILL"
                                     (format nil "~ds" remaining-time)
                                     panda-pi-grounder
                                     parsed-file
@@ -66,14 +69,16 @@
                               :output :string)
           (declare (ignore error-output))
           (decf remaining-time (elapsed-seconds start-time (get-internal-run-time)))
-          (unless (zerop success)
-            (error "Failed to ground the problem with exit code ~d.~%Output:~%~a" success output))
+          (cond ((= success 124)
+                 (error "Timed out while grounding the domain and problem"))
+                ((zerop success))
+                (t
+                 (error "Failed to ground the domain and problem with exit code ~d.~%Output:~%~a" success output)))
           (when (search "unreachable" output)
             (error "Panda grounder proved the problem unsolveable.~%Output:~%~a"  output)))
         (when (< remaining-time 0) (error "Timeout during grounding."))
         (when verbose (format t "~&Done grounding Panda problem.~%"))
 
-        (delete-file raw-plan)
         (setf start-time (get-internal-run-time))
         (multiple-value-bind (output error-output success)
             (uiop:run-program (list panda-pi-engine
@@ -81,12 +86,16 @@
                                     grounded-file)
                               :ignore-error-status t
                               :error-output :output
+                              :if-output-exists :supersede
                               :output raw-plan)
           (declare (ignore output error-output))
           (decf remaining-time (elapsed-seconds start-time (get-internal-run-time)))
-          (when (< remaining-time 0) (error "Timeout during grounding."))
-          (unless (zerop success)
-            (error "Failed to solve the problem with exit code ~d.~%Output:~%~a" success (alexandria:read-file-into-string raw-plan))))
+          (when (< remaining-time 0) (error "Timeout during planning."))
+          (cond ((or (= success 124) (= success 137))
+                 (error "Timed out while finding a solution for the problem (pandaPIengine)"))
+                ((zerop success))
+                (t
+                 (error "Failed to solve the problem with exit code ~d.~%Output:~%~a" success (alexandria:read-file-into-string raw-plan)))))
         (when verbose (format t "~&Done solving Panda problem.~%"))
         (multiple-value-bind (output error-output success)
             (uiop:run-program (list panda-pi-parser "-c" raw-plan hddl-plan)

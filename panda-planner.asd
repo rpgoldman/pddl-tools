@@ -10,7 +10,7 @@
 (in-package :panda-planner-asd)
 
 (defsystem panda-planner
-    :depends-on (pddl-planners)
+    :depends-on (pddl-planners hddl-utils)
   :version  (:read-file-form "version.lisp-expr")
   :pathname "planners/"
   :components ((:file "panda")))
