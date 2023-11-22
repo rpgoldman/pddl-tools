@@ -5,13 +5,17 @@
 
 (in-package :sift-pddl-planners)
 
+(defvar *panda-pi-parser* "pandaPIparser")
+(defvar *panda-pi-grounder* "pandaPIgrounder")
+(defvar *panda-pi-engine* "pandaPIengine")
+
 
 (defmethod run-planner (domain-file problem-file (planner-key (eql :panda))
                         &key planner-executable output-directory
                           verbose keep-temp
-                          (panda-pi-parser "pandaPIparser")
-                          (panda-pi-grounder "pandaPIgrounder")
-                          (panda-pi-engine "pandaPIengine")
+                          (panda-pi-parser *panda-pi-parser*)
+                          (panda-pi-grounder *panda-pi-grounder*)
+                          (panda-pi-engine *panda-pi-engine*)
                           (timeout-secs (* 10 60)) ; default to 10 minutes
                         &allow-other-keys)
   (declare (ignore planner-executable) (type fixnum timeout-secs))
@@ -21,7 +25,7 @@
              (if output-directory
                  (ensure-directories-exist output-directory)
                  (let ((new-pathname (merge-pathnames
-                                      (make-pathname `(:relative ,(symbol-name (gensym "panda-workdir"))))
+                                      (make-pathname :directory `(:relative ,(symbol-name (gensym "panda-workdir"))))
                                       (uiop:temporary-directory))))
                    (ensure-directories-exist new-pathname))))
            (*default-pathname-defaults* output-directory)
