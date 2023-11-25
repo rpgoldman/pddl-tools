@@ -618,7 +618,10 @@ removed).
   Special cases:
   1. NIL should yield (AND)
   2. Simple proposition (<pred> <arg>*) should be wrapped in AND as
-     (AND (<pred> <arg>*))"
+     (AND (<pred> <arg>*))
+  3. Implicit conjunction ((<pred> <arg>*)+) should be turned into
+a standard (explicit) conjunction.
+  If STRICT is non-NIL, then cases 2 and 3 should raise an error."
   (labels ((flatten-conj-list (cl)
              (alexandria:mappend #'flatten-1 cl))
            (flatten-1 (conj)
@@ -640,8 +643,9 @@ removed).
            (if strict
                (error "FLATTEN-CONJUNCTION expects a conjunction, but got a proposition: ~s" conj)
                `(and ,conj)))
-          (strict (error "FLATTEN-CONJUNCTION expects a conjunction as input, not an implicit conjunction."))
+          (strict
+           (error "FLATTEN-CONJUNCTION expects a conjunction, but got an IMPLICIT conjunction (list of conjuncts):~%~s" conj))
           (t
            ;; in this case we have an implicit conjunction with no initial 'and
-           ;; supply one.
+           ;; and this is *not* strict-mode.  supply an 'and.
            `(and ,@(flatten-conj-list conj))))))
