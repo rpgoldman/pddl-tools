@@ -73,7 +73,8 @@
 arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
   (when complete-p
     (unless domain (error "DOMAIN argument is mandatory."))
-    (unless goal (error "GOAL argument is mandatory.")))
+    ;; (unless goal (error "GOAL argument is mandatory."))
+    )
   (flet ((negated (fact) (eq (first fact) 'not)))
     (let ((domain (hddl-symbol domain))
           (objects (hddlify-tree objects))
@@ -157,7 +158,7 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
   `(:method ,method-name :parameters ,(copy-tree params)
      :task ,task-sexpr
      :precondition ,(copy-tree precond)
-     :ordered-subtasks (and ,@(copy-tree tasks))))
+     :ordered-subtasks ,(flatten-conjunction (copy-tree tasks) nil)))
 
 (defun method-subtasks (method)
   (cond ((find :ordered-subtasks method)
@@ -169,7 +170,8 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
         (t (error "Unable to find subtasks in method definition:~%~s" method))))
 
 (defsetf method-subtasks (method) (subtasks)
-  `(let ((subtasks (hddlify-tree ,subtasks)))
+  `(let ((subtasks (when subtasks       ; nil is just nil...
+                     (flatten-conjunction (hddlify-tree ,subtasks) nil))))
      (cond ((getf ,method :ordered-subtasks nil)
             (setf (getf ,method :ordered-subtasks) subtasks))
            ((getf ,method :tasks nil)
