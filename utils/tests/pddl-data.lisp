@@ -5,14 +5,14 @@
      (pddlify-tree ',sexp)))
 
 (def-pddl-data pddl-utils-tests::*pddl-keywords*
-  (:adl :strips 
-    :typing 
+  (:adl :strips
+    :typing
     :negative-preconditions
     :disjunctive-preconditions
     :equality
     :existential-preconditions
     :universal-preconditions
-    :quantified-preconditions 
+    :quantified-preconditions
     :existential-preconditions
     :universal-preconditions
     :conditional-effects
@@ -377,3 +377,14 @@
     (not (toll-area ?l1))
     (road ?l1 ?l2)
     (l10-0)))
+
+(def-pddl-data *implicit-conjuction*
+  ((foo bar)
+   (baz bletch bongle)
+   (bill fred)))
+
+(def-pddl-data *explicitified-conjuction*
+  (and
+   (foo bar)
+   (baz bletch bongle)
+   (bill fred)))
