@@ -28,8 +28,7 @@
   :version (:read-file-form "version.lisp-expr")
   :serial t
   :class :fiveam-tester-system
-  :test-names ((#:hddl-tests . :hddl-utils-tests)
-               )
+  :test-names ((#:hddl-tests . :hddl-utils-tests))
   :pathname "hddl-utils/tests/"
-  :components ((:file "tests")
-               (:file "hddl-data")))
+  :components ((:file "hddl-data")
+               (:file "tests")))

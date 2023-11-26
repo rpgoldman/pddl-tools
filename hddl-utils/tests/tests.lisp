@@ -1,12 +1,3 @@
-(in-package :common-lisp-user)
-
-(defpackage :hddl-utils-tests
-  (:use common-lisp hddl-utils fiveam)
-  (:import-from :alexandria #:set-equal)
-  (:import-from :hddl-io #:partition-method-line
-                #:read-hddl-file
-                #:complex-task-sexp-p))
-
 (in-package :hddl-utils-tests)
 
 ;; defined in hddl-data.lisp
@@ -242,3 +233,24 @@
   (let ((plan (hddl-utils:read-hddl-plan-file
                (asdf:system-relative-pathname "hddl-utils" "hddl-utils/tests/example-plan-comma-separated.hddl"))))
     (is (equalp *parsed-plan* plan))))
+
+(test method-subtasks
+  ;; set subtasks to method without them
+  (let ((method (copy-tree *method-no-subtasks*)))
+    (setf (method-subtasks method)
+          (copy-tree *method-subtasks*))
+    (is (equalp *full-method* method)))
+  ;; reset subtasks
+  (let ((method (copy-tree *method-different-subtasks*)))
+    (setf (method-subtasks method)
+          (copy-tree *method-subtasks*))
+    (is (equalp *full-method* method)))
+  ;; :tasks instead of :ordered-subtasks
+  (let ((method (copy-tree *method-different-subtasks*))
+        (template (copy-tree *full-method*)))
+    (setf method (subst :tasks :ordered-subtasks method)
+          template (subst :tasks :ordered-subtasks template))
+    (setf (method-subtasks method)
+          (copy-tree *method-subtasks*))
+    (is (equalp template method)))
+  )
