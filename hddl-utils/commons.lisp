@@ -170,13 +170,14 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
         (t (error "Unable to find subtasks in method definition:~%~s" method))))
 
 (defsetf method-subtasks (method) (subtasks)
-  `(let ((subtasks (when subtasks       ; nil is just nil...
-                     (flatten-conjunction (hddlify-tree ,subtasks) nil))))
-     (cond ((getf ,method :ordered-subtasks nil)
-            (setf (getf ,method :ordered-subtasks) subtasks))
-           ((getf ,method :tasks nil)
-            (setf (getf ,method :tasks) subtasks))
-           (t (setf (getf ,method :sub-tasks) subtasks)))))
+  (let ((subtasks-var (gensym "SUBTASKS")))
+    `(let ((,subtasks-var (when ,subtasks      ; nil is just nil...
+                       (flatten-conjunction (hddlify-tree ,subtasks) nil))))
+       (cond ((getf ,method :ordered-subtasks nil)
+              (setf (getf ,method :ordered-subtasks) ,subtasks-var))
+             ((getf ,method :tasks nil)
+              (setf (getf ,method :tasks) ,subtasks-var))
+             (t (setf (getf ,method :sub-tasks) ,subtasks-var))))))
 
 (defun method-task (method)
   (getf method :task))
@@ -377,24 +378,25 @@ element to *remain*.
   list)
 
 (defsetf domain-methods (domain) (methods)
-  `(progn
-    (check-type ,domain domain)
-    (let* ((method-tail (position :method ,domain :key #'tag-key))
-           (method-tail-end (position :method ,domain
-                                      :from-end t
-                                      :key #'tag-key))
-           (methods (copy-tree ,methods))
-           action-tail)
-      (cond (method-tail
-             (setf ,domain
-              (splice ,domain :start method-tail :end (1+ method-tail-end) :new methods)))
-            ((setf action-tail
-                   (position :action ,domain :key #'tag-key))
-             (setf ,domain
-                   (splice ,domain :start action-tail :end action-tail :new methods)))
-            (t (setf (cdr (last ,domain)) methods)))
-      ;; return something that fits with what SETF should return
-      (domain-methods ,domain))))
+  (let ((method-var (gensym "METHODS")))
+   `(progn
+      (check-type ,domain domain)
+      (let* ((method-tail (position :method ,domain :key #'tag-key))
+             (method-tail-end (position :method ,domain
+                                        :from-end t
+                                        :key #'tag-key))
+             (,method-var (copy-tree ,methods))
+             action-tail)
+        (cond (method-tail
+               (setf ,domain
+                     (splice ,domain :start method-tail :end (1+ method-tail-end) :new ,method-var)))
+              ((setf action-tail
+                     (position :action ,domain :key #'tag-key))
+               (setf ,domain
+                     (splice ,domain :start action-tail :end action-tail :new ,method-var)))
+              (t (setf (cdr (last ,domain)) ,method-var)))
+        ;; return something that fits with what SETF should return
+        (domain-methods ,domain)))))
 
 (defun remove-domain-methods (domain)
   (check-type domain domain)
