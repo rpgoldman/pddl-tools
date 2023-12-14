@@ -265,6 +265,7 @@ in the form of a list of actions."
                      #'(lambda (str obj)
                          (if (complex-task-sexp-p obj)
                              (destructuring-bind (keyword task-name
+                                                  &optional
                                                   param-keyword param-defs)
                                  obj
                                (if *canonical*
@@ -273,19 +274,20 @@ in the form of a list of actions."
                                      (pprint-logical-block (str obj
                                                                 :prefix "("
                                                                 :suffix ")")
-                                       (format str "~S ~S ~:_~S ~:_" keyword task-name param-keyword)
-                                       (pprint-logical-block (str param-defs
-                                                                  :prefix "("
-                                                                  :suffix ")")
-                                         (loop for (sublist . rest) on (min-canonical-sublists sorted-objs)
-                                               do
-                                                  (pprint-logical-block (str sublist)
-                                                    (pprint-indent :block 2 str)
-                                                    (let ((entities (reverse (cddr (reverse sublist))))
-                                                          (type (first (reverse sublist))))
-                                                      (format str "~{~W~^ ~:_~}" entities)
-                                                      (format str " - ~W~:_" type)
-                                                      (when rest (format str " "))))))))
+                                       (format str "~S ~S~@[ ~:_~S ~]~:_" keyword task-name param-keyword)
+                                       (when param-defs
+                                        (pprint-logical-block (str param-defs
+                                                                   :prefix "("
+                                                                   :suffix ")")
+                                          (loop for (sublist . rest) on (min-canonical-sublists sorted-objs)
+                                                do
+                                                   (pprint-logical-block (str sublist)
+                                                     (pprint-indent :block 2 str)
+                                                     (let ((entities (reverse (cddr (reverse sublist))))
+                                                           (type (first (reverse sublist))))
+                                                       (format str "~{~W~^ ~:_~}" entities)
+                                                       (format str " - ~W~:_" type)
+                                                       (when rest (format str " ")))))))))
                                    ;; minimal form, instead of canonical form
                                    (let ((sorted-objs
                                            (minimize-canonical-type-list
