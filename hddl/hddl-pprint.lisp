@@ -124,7 +124,7 @@ in the form of a list of actions."
              (parse-integer line :junk-allowed t)
            (collecting
                (cons id
-                (ecase format
+                (case format
                   (:comma-separated
                    (comma-separated-task->sexp (subseq (string-upcase line) (1+ pos))))
                   (:s-expression
@@ -153,7 +153,7 @@ in the form of a list of actions."
                   (partition-method-line (subseq line (1+ pos)))
                 (declare (type string task-string method-id subtasks))
                 (collecting `(,id
-                              ,(ecase format
+                              ,(case format
                                  (:default
                                   (space-separated-string->hddl-list (string-upcase task-string)))
                                  (:s-expression
