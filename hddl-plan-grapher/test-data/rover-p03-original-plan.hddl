@@ -1,0 +1,41 @@
+==>
+1 (navigate rover1 waypoint3 waypoint2)
+2 (sample_soil rover1 rover1store waypoint2)
+3 (communicate_soil_data rover1 general waypoint2 waypoint2 waypoint0)
+4 (navigate rover0 waypoint1 waypoint0)
+5 (sample_rock rover0 rover0store waypoint0)
+6 (navigate rover0 waypoint0 waypoint1)
+7 (communicate_rock_data rover0 general waypoint0 waypoint1 waypoint0)
+8 (navigate rover1 waypoint2 waypoint3)
+9 (navigate rover1 waypoint3 waypoint0)
+10 (calibrate rover1 camera1 objective0 waypoint0)
+11 (take_image rover1 waypoint0 objective0 camera1 colour)
+12 (navigate rover1 waypoint0 waypoint1)
+13 (communicate_image_data rover1 general objective0 colour waypoint1 waypoint0)
+root 14
+14 (achieve-goals) -> communicate-one-soil-data 15 16
+15 (communicate-soil-data waypoint2 rover1) -> achieve-communicated-soil-data 17 18 2 19
+16 (achieve-goals) -> communicate-one-rock-data 20 21
+17 (move-to rover1 waypoint2) -> go-there 1 22
+18 (empty-store rover1store rover1) -> already-empty
+19 (transmit-soil waypoint2 waypoint2 rover1) -> have-line-of-sight-for-soil 3
+20 (communicate-rock-data waypoint0 rover0) -> achieve-communicated-rock-data 23 24 5 25
+21 (achieve-goals) -> communicate-one-image-data 26 27
+22 (move-to rover1 waypoint2) -> already-there
+23 (move-to rover0 waypoint0) -> go-there 4 28
+24 (empty-store rover0store rover0) -> already-empty
+25 (transmit-rock waypoint0 waypoint0 rover0) -> go-to-line-of-sight-for-rock 29 7
+26 (communicate-image-data objective0 colour rover1) -> achieve-communicated-image-data 30 31 11 32
+27 (achieve-goals) -> check-for-all-goals-done
+28 (move-to rover0 waypoint0) -> already-there
+29 (move-to rover0 waypoint1) -> go-there 6 33
+30 (calibrate-camera rover1 camera1) -> calibrate-the-camera 34 10
+31 (get-line-of-sight rover1 objective0 waypoint0) -> have-line-of-sight-for-photo
+32 (communicate-image waypoint0 waypoint0 rover1 objective0 colour) -> relocate-then-communicate-image 35 13
+33 (move-to rover0 waypoint1) -> already-there
+34 (move-to rover1 waypoint0) -> go-there 8 36
+35 (move-to rover1 waypoint1) -> go-there 12 37
+36 (move-to rover1 waypoint0) -> go-there 9 38
+37 (move-to rover1 waypoint1) -> already-there
+38 (move-to rover1 waypoint0) -> already-there
+<==
