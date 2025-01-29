@@ -1,0 +1,33 @@
+==>
+1 switch_on instrument0 satellite0
+29 turn_to satellite0 groundstation2 star0
+30 calibrate satellite0 instrument0 groundstation2
+4 turn_to satellite0 phenomenon6 groundstation2
+5 take_image satellite0 phenomenon6 instrument0 thermograph0
+6 turn_to satellite0 star5 phenomenon6
+7 take_image satellite0 star5 instrument0 thermograph0
+8 turn_to satellite0 phenomenon4 star5
+9 take_image satellite0 phenomenon4 instrument0 thermograph0
+
+root 10
+10 main -> take-one 11 12
+11 have-image phenomenon6 thermograph0 -> prepare-then-take 13 14
+13 prepare-instrument satellite0 instrument0 -> prepare 17 18
+17 turn-on-instrument satellite0 instrument0 -> turn-on 1
+18 calibrate-instrument satellite0 instrument0 -> repoint-then-calibrate 29 30
+14 take-image satellite0 instrument0 phenomenon6 thermograph0 -> turn-then-take 4 5
+12 main -> take-one 15 16
+15 have-image star5 thermograph0 -> prepare-then-take 19 20
+19 prepare-instrument satellite0 instrument0 -> prepare 23 24
+23 turn-on-instrument satellite0 instrument0 -> already-on
+24 calibrate-instrument satellite0 instrument0 -> no-calibration-needed
+20 take-image satellite0 instrument0 star5 thermograph0 -> turn-then-take 6 7
+16 main -> take-one 21 22
+21 have-image phenomenon4 thermograph0 -> prepare-then-take 25 26
+25 prepare-instrument satellite0 instrument0 -> prepare 27 28
+27 turn-on-instrument satellite0 instrument0 -> already-on
+28 calibrate-instrument satellite0 instrument0 -> no-calibration-needed
+26 take-image satellite0 instrument0 phenomenon4 thermograph0 -> turn-then-take 8 9
+22 main -> all-done
+<==
+
