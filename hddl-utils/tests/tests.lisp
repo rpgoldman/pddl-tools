@@ -254,3 +254,21 @@
           (copy-tree *method-subtasks*))
     (is (equalp template method)))
   )
+
+(test extract-sequence
+  (let* ((plan (hddl-utils:read-hddl-plan-file
+                (asdf:system-relative-pathname "hddl-utils"
+                                               "hddl-utils/tests/extract-seq.hddl")))
+         (seq (hddl-utils:hddl-plan-to-pddl-plan plan)))
+    (is (equalp
+         (pddl-utils:pddlify-tree
+          '((SWITCH_ON INSTRUMENT0 SATELLITE0)
+            (TURN_TO SATELLITE0 GROUNDSTATION2 STAR0)
+            (CALIBRATE SATELLITE0 INSTRUMENT0 GROUNDSTATION2)
+            (TURN_TO SATELLITE0 PHENOMENON6 GROUNDSTATION2)
+            (TAKE_IMAGE SATELLITE0 PHENOMENON6 INSTRUMENT0 THERMOGRAPH0)
+            (TURN_TO SATELLITE0 STAR5 PHENOMENON6)
+            (TAKE_IMAGE SATELLITE0 STAR5 INSTRUMENT0 THERMOGRAPH0)
+            (TURN_TO SATELLITE0 PHENOMENON4 STAR5)
+            (TAKE_IMAGE SATELLITE0 PHENOMENON4 INSTRUMENT0 THERMOGRAPH0)))
+         seq))))

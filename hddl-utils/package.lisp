@@ -96,5 +96,6 @@
    #:hddl-problem-to-pddl-problem
    #:canonicalize-problem
    #:hddl-variable
+   #:hddl-plan                          ; type
    )
 )

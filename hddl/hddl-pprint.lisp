@@ -54,26 +54,6 @@ FOO BAR - TYPE1 BAZ - TYPE2."
   (let ((*package* (find-package *hddl-package*)))
     (read stream nil nil)))
 
-
-#|
-
-(defun print-pddl-plan-to-file (sexp filename &optional (if-exists :error))
-  "Print a PDDL plan to a file in IPC format that the VAL
-plan validator will read."
-  (with-open-file (str filename :direction :output :if-exists if-exists)
-    (print-pddl-plan sexp str)))
-
-(defun print-pddl-plan (sexp &optional (stream t))
-  "Print a PDDL plan in a format that the VAL
-validator will read it: one action s-expression per
-line."
-  (let ((*package* (find-package *pddl-package*))
-        (*print-pretty* nil))
-    (dolist (step sexp)
-      (prin1 step stream)
-      (terpri stream))))
-|#
-
 (defun read-HDDL-plan-file (filename)
   "Read a HDDL plan from FILENAME and return it
 in the form of a list of actions."
@@ -116,7 +96,15 @@ in the form of a list of actions."
                     (t :default))))
       (setf actions
        (iter (for line initially first-line then (read-line stream))
-         (when (string= (subseq line 0 4) "root")
+         (when (string= (string-trim () line) "")
+           (next-iteration))
+         (when (string= (handler-case (subseq line 0 4)
+                          #+sbcl(sb-kernel:bounding-indices-bad-error ()
+                                  "")
+                          ;; AFAICT, neither Allegro nor CCL
+                          ;; have distinct array bound errors.
+                          #-sbcl (error () ""))
+                        "root")
            ;; done reading actions
            (setf root-line line)
            (finish))
