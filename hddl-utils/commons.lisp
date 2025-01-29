@@ -441,10 +441,18 @@ element to *remain*.
   `(let ((*pddl-package* *hddl-package*))
      (setf (pddl-utils:domain-predicates ,domain) ,new-pred-list)))
 
+(defun hddl-plan-p (sexp)
+  (and (listp sexp) (eq (first sexp) :hddl-plan)))
+
+(deftype hddl-plan ()
+  "An HDDL-PLAN is an s-expression headed by :HDDL-PLAN and whose
+CDR is a property list with :ACTIONS, :ROOTS and :DECOMOPOSITIONS."
+  '(satisfies hddl-plan-p))
+
 (defun hddl-plan-to-pddl-plan (hddl-plan)
   "Take the S-expression form of an HDDL plan and return a PDDL plan extracted from it."
   (pddlify-tree
-   (mapcar #'cdr (getf hddl-plan :actions))))
+   (mapcar #'cdr (getf (cdr hddl-plan) :actions))))
 
 (defun hddl-domain-to-pddl-domain (hddl-domain)
   (pddl-utils:make-domain (domain-name hddl-domain)
