@@ -1,5 +1,5 @@
 ;;; -------------------------------------------------------------------------
-;;; Copyright 2011-2016, SIFT, LLC, Robert P. Goldman, and Ugur Kuter
+;;; Copyright 2011-2025, SIFT, LLC, Robert P. Goldman, and Ugur Kuter
 ;;; Available under the BSD 3-clause license, see license.txt
 ;;;---------------------------------------------------------------------------
 
@@ -315,15 +315,30 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
     (domain-constants domain)))
 
 
-(defun domain-requirements (domain)
-  (domain-reqs domain))
-
 (defun domain-reqs (domain)
   (assert (domain-p domain))
   (let ((head (find-if #'(lambda(e)
                            (and (listp e) (eq (car e) ':requirements)))
                        domain)))
     (rest head)))
+
+(defsetf domain-reqs (domain) (req-list)
+  `(progn
+     (check-type ,domain domain)
+     (let ((head (find-if #'(lambda(e)
+                           (and (listp e) (eq (car e) ':requirements)))
+                       ,domain)))
+       (if (null head)
+           (setf (cddr ,domain)
+                 (cons :requirements ,req-list))
+           (setf (cdr head) (copy-list ,req-list)))
+       ,req-list)))
+
+(defun domain-requirements (domain)
+  (domain-reqs domain))
+
+(defsetf domain-requirements (domain) (new-reqs)
+  `(setf (domain-reqs ,domain) ,new-reqs))
 
 (defun domain-types (domain)
   (assert (domain-p domain))
@@ -435,6 +450,11 @@ dispense with quotes and keyword arguments."
 (defun action-name (action)
   (assert (action-p action))
   (second action))
+
+(defsetf action-name (action) (name)
+  `(progn
+    (assert (action-p ,action))
+    (setf (second ,action) (pddlify ,name))))
 
 
 ;; This is tailored to FastDownward. It seems there is no way
