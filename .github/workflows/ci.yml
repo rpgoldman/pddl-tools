@@ -31,10 +31,14 @@ jobs:
       image: clfoundation/${{matrix.lisp}}:latest
 
     steps:
-    - name: install JSON wrangling binaries
-      run: apt update && apt install -y jq python3 python3-pip && python3 -m pip install yq check-jsonschema
-
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
     - uses: actions/checkout@v3
+
+
+    - name: install JSON wrangling binaries
+      run: apt update && apt install -y jq && python3 -m pip install yq check-jsonschema
 
     - run: install-quicklisp
 
