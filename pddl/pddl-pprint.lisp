@@ -72,18 +72,24 @@ in the form of a list of actions."
         while x
         collect x))
 
- 
+
 
 
 ;;;---------------------------------------------------------------------------
 ;;; Type checkers
 ;;;---------------------------------------------------------------------------
-(declaim (inline pddl-symbol))
+(declaim (inline pddl-symbol)
+         (ftype (function ((or symbol string) &optional (or symbol package))
+                          (values symbol &optional))
+                pddl-symbol))
 (defun pddl-symbol (symbol &optional (package *pddl-package*))
+  "Create and return a symbol interned in the `package` (which defaults to
+the value of `*pddl-package*`).  To preserve PDDL case-insensitivity, the
+input name will be upcased before interning."
   (let ((symbol (etypecase symbol
                   (string (string-upcase (string-left-trim (list #\space #\tab) symbol)))
-                  (symbol symbol))))
-   (uiop:intern* symbol package)))
+                  (symbol (string-upcase (symbol-name symbol))))))
+    (uiop:intern* symbol package)))
 
 (defun define-keyword ()
   (pddl-symbol '#:define))
@@ -258,7 +264,7 @@ in the form of a list of actions."
                           ,(uiop:find-symbol* '#:imply *pddl-package*)
                           ,(uiop:find-symbol* '#:when *pddl-package*)))))
 
-(set-pprint-dispatch '(satisfies bool-fun-p) 
+(set-pprint-dispatch '(satisfies bool-fun-p)
                       #'(lambda (str obj)
                           (pprint-logical-block (str obj)
                             (format str "(~S" (first obj))

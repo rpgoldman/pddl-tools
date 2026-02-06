@@ -238,3 +238,15 @@
   (signals error (flatten-conjunction '(hunt snark) t))
   (signals error (flatten-conjunction (rest *conjunction*) t))
   (signals error (flatten-conjunction *implicit-conjuction*) t))
+
+(test pddl-symbol
+  (is (eq 'pddl::foo
+          (pddl-symbol "Foo")))
+  (is (eq 'pddl::foo
+          (pddl-symbol '#:foo)))
+  (is (equalp
+       "FOO"
+       (symbol-name (pddl-symbol "foo"))))
+  (is (equalp
+       "FOO"
+       (symbol-name (pddl-symbol '#:|foo|)))))

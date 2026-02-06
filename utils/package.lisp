@@ -52,6 +52,7 @@
 
    ;; move stuff into the pddl package
    #:pddlify
+   #:pddl-symbol
    #:pddlify-tree
 
    ;; generalized accessors
