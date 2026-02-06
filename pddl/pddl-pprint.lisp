@@ -276,6 +276,19 @@ input name will be upcased before interning."
                             (format str ")")))
                       0 *pddl-pprint-dispatch*)
 
+;;; Print numbers nicely for domains with numeric fluents
+;;; Note that floats *must not* be printed in exponential notation
+;;; for PDDL planners.
+(set-pprint-dispatch 'integer
+                     #'(lambda (str obj)
+                         (format str "~d" obj))
+                     0 *pddl-pprint-dispatch*)
+
+(set-pprint-dispatch 'float
+                     #'(lambda (str obj)
+                         (format str "~f" obj))
+                     0 *pddl-pprint-dispatch*)
+
 ;;; FIXME: need a pprint dispatcher for :action so that we get the actions
 ;;; formatted nicely with the keywords all starting new lines.  Also need to
 ;;; make sure that the typed lists of parameters get formatted properly.
