@@ -387,11 +387,12 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
      (alexandria:appendf (cddr ,domain)
               ,action-list)))
 
-(defun domain-action (domain name)
+(defun domain-action (domain name &key (error-p t))
   (assert (domain-p domain))
   (let ((all-actions (domain-actions domain)))
     (or (find name all-actions :key 'second)
-        (error "No such action ~a in domain ~a" name (domain-name domain)))))
+        (and error-p
+             (error "No such action ~a in domain ~a" name (domain-name domain))))))
 
 (defun remove-domain-actions (domain)
   (assert (domain-p domain))

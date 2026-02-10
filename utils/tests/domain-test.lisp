@@ -209,6 +209,36 @@
     (is
      (equal (domain-actions orig-domain)
             *airport-action-list*))
+    (is (equal
+         (pddlify-tree
+          '(:ACTION MOVE :PARAMETERS
+            (?A - AIRPLANE ?T - AIRPLANETYPE ?D1 - DIRECTION ?S1 ?S2 - SEGMENT ?D2
+             - DIRECTION)
+            :PRECONDITION
+            (AND (HAS-TYPE ?A ?T) (IS-MOVING ?A) (NOT (= ?S1 ?S2)) (FACING ?A ?D1)
+             (CAN-MOVE ?S1 ?S2 ?D1) (MOVE-DIR ?S1 ?S2 ?D2) (AT-SEGMENT ?A ?S1)
+             (NOT (EXISTS (?A1 - VEHICLE)
+                   (AND (NOT (= ?A1 ?A)) (BLOCKED ?S2 ?A1))))
+             (FORALL (?S - SEGMENT)
+              (IMPLY (AND (IS-BLOCKED ?S ?T ?S2 ?D2) (NOT (= ?S ?S1)))
+               (NOT (OCCUPIED ?S)))))
+            :EFFECT
+            (AND (OCCUPIED ?S2) (BLOCKED ?S2 ?A) (NOT (OCCUPIED ?S1))
+             (WHEN (NOT (IS-BLOCKED ?S1 ?T ?S2 ?D2)) (NOT (BLOCKED ?S1 ?A)))
+             (WHEN (NOT (= ?D1 ?D2)) (NOT (FACING ?A ?D1)))
+             (NOT (AT-SEGMENT ?A ?S1))
+             (FORALL (?S - SEGMENT)
+              (WHEN (IS-BLOCKED ?S ?T ?S2 ?D2) (BLOCKED ?S ?A)))
+             (FORALL (?S - SEGMENT)
+              (WHEN (AND (IS-BLOCKED ?S ?T ?S1 ?D1) (NOT (= ?S ?S2))
+                         (NOT (IS-BLOCKED ?S ?T ?S2 ?D2)))
+                (NOT (BLOCKED ?S ?A))))
+             (AT-SEGMENT ?A ?S2) (WHEN (NOT (= ?D1 ?D2)) (FACING ?A ?D2)))))
+         (domain-action orig-domain (pddl-symbol '#:move))))
+    (signals error
+      (domain-action orig-domain (pddl-symbol '#:foobar)))
+    (is-false
+      (domain-action orig-domain (pddl-symbol '#:foobar) :error-p nil))
     (is (null (domain-functions orig-domain)))
     (is (equal (domain-constants openstacks-domain)
                (pddlify-tree `(p1 p2 p3 p4 p5 - product

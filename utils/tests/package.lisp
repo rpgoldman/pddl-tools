@@ -10,6 +10,7 @@
                 #:with-fixture
                 #:is
                 #:is-true
+                #:is-false
                 #:test
                 #:signals
                 #:run!
