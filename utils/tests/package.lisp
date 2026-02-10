@@ -6,8 +6,10 @@
   (:import-from fiveam
                 #:def-suite*
                 #:def-fixture
+                #:in-suite
                 #:with-fixture
                 #:is
+                #:is-true
                 #:test
                 #:signals
                 #:run!
