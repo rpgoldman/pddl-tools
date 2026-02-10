@@ -35,4 +35,5 @@
   :pathname "utils/tests/"
   :components ((:file "package")
                (:file "pddl-data")
-               (:file "domain-test")))
+               (:file "domain-test")
+               (:file "metric-fluents-tests")))

@@ -5,6 +5,10 @@
 
 (in-package :pddl-utils)
 
+(defparameter +DEFAULT-REQUIREMENTS+ '(:adl :typing)
+  "The default set of requirements: will be assumed if domain requirements
+are not explicitly supplied.")
+
 (defun pddl-interned (sym)
   (eq (symbol-package sym) (find-package :pddl)))
 

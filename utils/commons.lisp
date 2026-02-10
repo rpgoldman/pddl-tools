@@ -81,14 +81,26 @@
            domain-expr))
 
 ;; makers
-(defun make-domain (name &key (requirements '(:adl)) constants predicates actions
-                    types)
+(defun make-domain (name &key (requirements +DEFAULT-REQUIREMENTS+ requirements-supplied-p)
+                           constants predicates
+                           functions actions types)
+  (unless requirements-supplied-p
+    (cerror "defaulting to ~s" "requirements flags for domain not supplied"
+            +DEFAULT-REQUIREMENTS+))
   (let ((constants (pddlify-tree constants))
         (predicates (pddlify-tree predicates))
         (actions (pddlify-tree actions))
         (types (pddlify-tree types))
-        (functions (when (member :action-costs requirements)
-                     (pddlify-tree '((total-cost) - number)))))
+        (functions (cond
+                     ((member :action-costs requirements)
+                      (pddlify-tree '((total-cost) - number)))
+                     (functions
+                      (unless (member :fluents requirements)
+                        (cerror
+                         "Continue and add :fluents to requirements"
+                         "Functions provided, but :fluents requirement not specified.")
+                        (push :functions requirements))
+                      (pddlify-tree functions)))))
     (if (member :durative-actions requirements)
         (assert (every #'durative-action-sexp-p actions))
         (assert (every #'action-sexp-p actions)))
@@ -101,7 +113,7 @@
        ,@actions)))
 
 (defun canonicalize-domain (old-domain)
-  (let ((requirements
+  (let* ((requirements
           (progn
             (unless (has-element-p old-domain :requirements)
               (error "No requirements in domain.  Don't know how to handle it."))
@@ -112,6 +124,9 @@
         (predicates
           (when (has-element-p old-domain :predicates)
             (domain-predicates old-domain)))
+         (functions
+           (when (has-element-p old-domain :functions)
+             (domain-functions old-domain)))
         (constants
           (when (has-element-p old-domain :constants)
             (domain-constants old-domain)))
@@ -121,10 +136,11 @@
              :types types
              :constants constants
              :predicates predicates
+             :functions functions
              :actions actions)))
 
 (defun make-problem (name &key requirements domain objects init goal
-                     (complete-p t))
+                            (complete-p t))
   "Make a new PDDL problem s-expression initialized as per the keyword
 arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
   (when complete-p
@@ -135,6 +151,8 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
           (objects (pddlify-tree objects))
           (init (pddlify-tree init))
           (goal (pddlify-tree goal)))
+      ;; these two fixers should be tweaked going forward, to permit both
+      ;; the repair actions and just leaving the domain as it is.
       (when (some #'negated init)
         (cerror "Remove negated initial facts."
                 "Negated facts in :init are unnecessary and may break some planners.")
@@ -144,12 +162,12 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
                 "Some duplicated facts in init.  This is known to break some planners.")
         (setf init (remove-duplicates init :test 'equal)))
       `(,(pddl-symbol 'pddl:define) (,(pddl-symbol 'pddl:problem) ,(pddlify name))
-           (:domain ,domain)
-         ,@(when requirements
-                `((:requirements ,@requirements)))
-         (:objects ,@objects)
-         (:init ,@init)
-         (:goal ,goal)))))
+        (:domain ,domain)
+        ,@(when requirements
+            `((:requirements ,@requirements)))
+        (:objects ,@objects)
+        (:init ,@init)
+        (:goal ,goal)))))
 
 (defmethod copy-domain ((domain list))
   (copy-tree domain))
@@ -369,6 +387,12 @@ arguments.  Unless COMPLETE-P is NIL, will check for mandatory components."
      (alexandria:appendf (cddr ,domain)
               ,action-list)))
 
+(defun domain-action (domain name)
+  (assert (domain-p domain))
+  (let ((all-actions (domain-actions domain)))
+    (or (find name all-actions :key 'second)
+        (error "No such action ~a in domain ~a" name (domain-name domain)))))
+
 (defun remove-domain-actions (domain)
   (assert (domain-p domain))
   `(,(pddl-symbol 'pddl:define) ,(second domain)
@@ -515,6 +539,13 @@ dispense with quotes and keyword arguments."
            (domain-reqs pddl-domain2))
    :test #'equal))
 
+(defun all-types (typed-list)
+  (union '(pddl:object)
+   (remove-duplicates
+    (iter (for type in typed-list)
+      (unless (eq type '-)
+        (collecting type))))))
+
 (defun merge-domain-types (pddl-domain1 pddl-domain2)
   (let ((typed-list
          (append (pddl-pprinter::canonicalize-types (domain-types pddl-domain1))
@@ -522,11 +553,9 @@ dispense with quotes and keyword arguments."
                                                      pddl-domain2))))
         (parent-type-table (make-hash-table :test #'eql))
         all-types new-typed-list)
-
-    (setf all-types (loop for type in typed-list
-                          unless (eql type '-)
-                            collect type))
-    (loop
+    
+    (setf all-types (all-types typed-list))
+    (loop 
       with start = 0
       with lst = typed-list
       for pos = (position '- lst)
