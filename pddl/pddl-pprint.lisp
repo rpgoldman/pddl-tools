@@ -278,12 +278,18 @@ input name will be upcased before interning."
 
 ;;; Print numbers nicely for domains with numeric fluents
 ;;; Note that floats *must not* be printed in exponential notation
-;;; for PDDL planners.
+;;; for PDDL
+
+;;; Note the following two dispatch table entries, benign on Allegro
+;;; and CCL, cause disastrous stack overflow (infinite recursion)
+;;; on SBCL. Fix from Stas Bokuraev. [2026/03/27:rpg]
+#-sbcl
 (set-pprint-dispatch 'integer
                      #'(lambda (str obj)
                          (format str "~d" obj))
                      0 *pddl-pprint-dispatch*)
 
+#-sbcl
 (set-pprint-dispatch 'float
                      #'(lambda (str obj)
                          (format str "~f" obj))
