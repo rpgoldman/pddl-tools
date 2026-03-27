@@ -277,6 +277,14 @@
   (is (equalp
        "FOO"
        (symbol-name (pddl-symbol "foo"))))
-  (is (equalp
-       "FOO"
-       (symbol-name (pddl-symbol '#:|foo|)))))
+(is (equalp
+        "FOO"
+        (symbol-name (pddl-symbol '#:|foo|)))))
+
+(test read-write-no-stack-overflow
+  (let ((domain (read-planning-input
+                 (concatenate 'string *tests-dir* "pddl-domain.lisp"))))
+    (uiop:with-temporary-file (:stream str :pathname pn)
+      (pprint-pddl domain str)
+      :close-stream
+      (is-true (probe-file pn)))))
