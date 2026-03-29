@@ -283,16 +283,16 @@ input name will be upcased before interning."
 ;;; Note the following two dispatch table entries, benign on Allegro
 ;;; and CCL, cause disastrous stack overflow (infinite recursion)
 ;;; on SBCL. Fix from Stas Bokuraev. [2026/03/27:rpg]
-#-sbcl
 (set-pprint-dispatch 'integer
                      #'(lambda (str obj)
-                         (format str "~d" obj))
+                         (let ((*print-pretty* nil))
+                          (format str "~d" obj)))
                      0 *pddl-pprint-dispatch*)
 
-#-sbcl
 (set-pprint-dispatch 'float
                      #'(lambda (str obj)
-                         (format str "~f" obj))
+                         (let ((*print-pretty* nil))
+                          (format str "~f" obj)))
                      0 *pddl-pprint-dispatch*)
 
 ;;; FIXME: need a pprint dispatcher for :action so that we get the actions
