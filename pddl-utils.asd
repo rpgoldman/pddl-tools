@@ -36,4 +36,5 @@
   :components ((:file "package")
                (:file "pddl-data")
                (:file "domain-test")
-               (:file "metric-fluents-tests")))
+               (:file "metric-fluents-tests")
+               (:file "topological-sort-tests")))
