@@ -541,8 +541,8 @@ dispense with quotes and keyword arguments."
 (defun remove-parameter (param param-list)
   "Return a new parameter list resulting from removing PARAM from
 PARAM-LIST."
-  (let ((pla (typelist-to-alist (canonicalize-types param-list))))
-    (alist-to-typelist (remove param pla :key #'car))))
+  (let ((pla (typelist-to-alist param-list)))
+    (alist-to-typelist (remove param pla :key #'car) t)))
 
 (defun action-name (action)
   (assert (action-p action))
