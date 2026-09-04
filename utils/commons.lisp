@@ -738,7 +738,11 @@ minimized typed list."
     (let ((queue (sort (copy-list (gethash object-sym children))
                        'string-lessp)))
       (iter (while queue)
+        (with visited = (make-hash-table :test 'eq))
         (for current = (pop queue))
+        (if (gethash current visited)
+            (error "Visiting type ~a twice: types list is cyclic." current)
+            (setf (gethash current visited) t))
         (push (cons current
                     (or (cdr (assoc current alist :test 'eq))
                         object-sym))
