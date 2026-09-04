@@ -378,10 +378,11 @@ interned in PACKAGE (defaults to current binding of
 (defsetf domain-types (domain) (new-type-list)
   `(progn
      (check-type ,domain domain)
-     (let ((sorted (topological-sort-types ,new-type-list)))
-       (setf
-        (cdr (find :types (cddr ,domain) :key 'first))
-        sorted))))
+     (let ((sorted (topological-sort-types (pddlify-tree ,new-type-list))))
+       (alexandria:if-let ((cell (find :types (cddr ,domain) :key 'first)))
+         (setf (cdr cell) sorted)
+         (error "No :types element in this domain. Put domain in canonical form before attempting to modify types."))
+       sorted)))
 
 (defun domain-functions (domain)
   (assert (domain-p domain))
