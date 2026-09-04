@@ -91,7 +91,7 @@
         (predicates (pddlify-tree predicates))
         (derived (pddlify-tree derived))
         (actions (pddlify-tree actions))
-        (types (pddlify-tree types))
+        (types (topological-sort-types (pddlify-tree types)))
         (functions (cond
                      ((member :action-costs requirements)
                       (pddlify-tree '((total-cost) - number)))
@@ -115,6 +115,9 @@
        ,@actions)))
 
 (defun canonicalize-domain (old-domain)
+  "Return a new domain built from OLD-DOMAIN's components.
+Types are topologically sorted so that no type is used as a supertype
+before it has been declared as a subtype."
   (let* ((requirements
           (progn
             (unless (has-element-p old-domain :requirements)
@@ -372,6 +375,15 @@ interned in PACKAGE (defaults to current binding of
                        domain)))
     (rest head)))
 
+(defsetf domain-types (domain) (new-type-list)
+  `(progn
+     (check-type ,domain domain)
+     (let ((sorted (topological-sort-types (pddlify-tree ,new-type-list))))
+       (alexandria:if-let ((cell (find :types (cddr ,domain) :key 'first)))
+         (setf (cdr cell) sorted)
+         (error "No :types element in this domain. Put domain in canonical form before attempting to modify types."))
+       sorted)))
+
 (defun domain-functions (domain)
   (assert (domain-p domain))
   (let ((head (find-if #'(lambda(e)
@@ -525,6 +537,12 @@ dispense with quotes and keyword arguments."
       (second
        (member :parameters ,action))
       (pddlify-tree ,params))))
+
+(defun remove-parameter (param param-list)
+  "Return a new parameter list resulting from removing PARAM from
+PARAM-LIST."
+  (let ((pla (typelist-to-alist param-list)))
+    (alist-to-typelist (remove param pla :key #'car) t)))
 
 (defun action-name (action)
   (assert (action-p action))
@@ -692,6 +710,68 @@ dispense with quotes and keyword arguments."
                (rest (problem-goal pddl-problem2)))
        :test #'equal)))
 
+(defun topological-sort-types (typed-list)
+  "Sort TYPED-LIST so that no type appears as a supertype (right of -)
+before it has appeared as a subtype (left of -).  The type OBJECT is
+the universal supertype and needs no prior declaration.  Returns a
+minimized typed list."
+  (when (null typed-list)
+    (return-from topological-sort-types nil))
+  (let* ((canonical (canonicalize-types typed-list))
+         (alist (typelist-to-alist canonical))
+         (children (make-hash-table :test 'eq))
+         (declared (make-hash-table :test 'eq))
+         (object-sym (pddl-symbol 'object))
+         ordered)
+    ;; Ensure types used only as supertypes are declared as children of OBJECT.
+    (iter (for (child . nil) in alist)
+      (setf (gethash child declared) t))
+    (iter (for (nil . parent) in alist)
+      (unless (or (eq parent object-sym)
+                  (gethash parent declared))
+        (push (cons parent object-sym) alist)
+        (setf (gethash parent declared) t)))
+    ;; Build parent -> children map.
+    (iter (for (child . parent) in alist)
+      (push child (gethash parent children)))
+    ;; BFS from OBJECT, collecting entries in topological order.
+    (let ((queue (sort (copy-list (gethash object-sym children))
+                       'string-lessp)))
+      (iter (while queue)
+        (with visited = (make-hash-table :test 'eq))
+        (for current = (pop queue))
+        (if (gethash current visited)
+            (error "Visiting type ~a twice: types list is cyclic." current)
+            (setf (gethash current visited) t))
+        (push (cons current
+                    (or (cdr (assoc current alist :test 'eq))
+                        object-sym))
+              ordered)
+        (let ((kids (sort (copy-list (gethash current children))
+                          'string-lessp)))
+          (alexandria:appendf queue kids))))
+    (setf ordered (nreverse ordered))
+    ;; Group consecutive same-parent entries into a minimized typed list,
+    ;; preserving the topological order (unlike minimize-canonical-type-list
+    ;; which sorts alphabetically by supertype).
+    (let (result current-parent current-group)
+      (dolist (entry ordered)
+        (destructuring-bind (child . parent) entry
+          (if (eq parent current-parent)
+              (push child current-group)
+              (progn
+                (when current-group
+                  (setf result
+                        (nconc result
+                               `(,@(nreverse current-group) - ,current-parent))))
+                (setf current-parent parent
+                      current-group (list child))))))
+      (when current-group
+        (setf result
+              (nconc result
+                     `(,@(nreverse current-group) - ,current-parent))))
+      result)))
+
 (defun remove-types-from-list (typed-list &optional acc)
   "Return all the elements of the TYPED-LIST with
 their typing information removed."
@@ -702,11 +782,24 @@ their typing information removed."
 
 (defun typelist-to-alist (typed-list)
   "TYPED-LIST must be a canonical-form typed list (see CANONICALIZE-TYPE-LIST).
-Translates to (constant . type) alist."
+Translates to (constant . type) alist.  Note that this will be an order-preserving
+translation, which is important for handling parameter lists."
   (let ((type-list (canonicalize-types typed-list)))
     (iterate (for (constant dash type . nil) on type-list by 'cdddr)
       (assert (eq dash '-))
       (collecting (cons constant type)))))
+
+(defun alist-to-typelist (alist &optional canonicalizep)
+  "ALIST is an alist of (constant . type), likely produced by `TYPELIST-TO-ALIST`.
+Translate it to a typed list and return it.  If CANONICALIZEP is non-NIL,
+return a canonical type list, otherwise return a minimized one.  Note that if
+CANONICALIZEP is true, then this translation will be order-preserving."
+  (let ((type-list (alexandria:mappend
+                    #'(lambda (x) (destructuring-bind (c . typ) x
+                                    `(,c - ,typ)))
+                           alist)))
+    (if canonicalizep type-list
+        (pddl-pprinter::minimize-canonical-type-list type-list ))))
 
 (defun positive-literal-p (sexp &key (predicates nil predicates-supplied-p))
   (and (listp sexp)

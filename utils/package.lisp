@@ -89,9 +89,12 @@
    #:exists-same
    #:add-to-domain-constants
    #:remove-types-from-list
+   #:remove-parameter
    ;; simplifications
    #:canonicalize-types
    #:typelist-to-alist
+   #:alist-to-typelist
+   #:topological-sort-types
 
 
    ;; I/O
