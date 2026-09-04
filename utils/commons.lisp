@@ -724,7 +724,7 @@ minimized typed list."
          (object-sym (pddl-symbol 'object))
          ordered)
     ;; Ensure types used only as supertypes are declared as children of OBJECT.
-    (iter (for (child . parent) in alist)
+    (iter (for (child . nil) in alist)
       (setf (gethash child declared) t))
     (iter (for (nil . parent) in alist)
       (unless (or (eq parent object-sym)

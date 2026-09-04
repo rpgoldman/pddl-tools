@@ -133,13 +133,13 @@
                    "--exit-status")))))))
 
 (defun yaml-to-json (input-file output-file)
-  (let ((input-file (if (pathnamep input-file) (namestring input-file) input-file))
+  (let* ((input-file (if (pathnamep input-file) (namestring input-file) input-file))
         (output-file (if (pathnamep output-file) (namestring output-file) output-file))
-        (yq-command (yq-command)))
-    (uiop:run-program (append yq-command (list input-file))
-                                   :output output-file
-                                   :error-output :string
-                                   :ignore-error-status t)))
+        (yq-command (append (yq-command) (list input-file))))
+    (uiop:run-program yq-command
+                      :output output-file
+                      :error-output :string
+                      :ignore-error-status t)))
 
 
 (test validate-domain

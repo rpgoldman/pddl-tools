@@ -63,6 +63,11 @@ Supertypes must precede subtypes."
     (is (equal (topological-sort-types input)
                (pddlify-tree '(a b - object c - a d - c))))))
 
+(test topological-sort-multiple-supertypes
+  "A type with more than one supertype signals an error."
+  (let ((input (pddlify-tree '(foo - a foo - b a b - object))))
+    (signals error (topological-sort-types input))))
+
 ;;; --- (setf domain-types) ---
 
 (test setf-domain-types-basic
@@ -104,4 +109,4 @@ Supertypes must precede subtypes."
       (is (set-equal
          (typelist-to-alist (canonicalize-types orig-types))
          (typelist-to-alist (canonicalize-types new-types))
-         :test #'equal))))))
+         :test #'equal)))))
