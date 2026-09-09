@@ -808,6 +808,55 @@ CANONICALIZEP is true, then this translation will be order-preserving."
            (member (first sexp) predicates)
            t)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Static predicate analysis
+
+(defun effect-affected-predicate-names (effect)
+  "Return a list of predicate-name symbols that appear as positive or negative
+literals in EFFECT.  Recurses through AND, NOT, and FORALL.  For WHEN and
+IMPLY only the consequent is examined, since the antecedent references
+predicates without modifying them."
+  (when (null effect)
+    (return-from effect-affected-predicate-names nil))
+  (case (first effect)
+    (and
+     (iter (for sub in (rest effect))
+       (unioning (effect-affected-predicate-names sub) :test #'eq)))
+    (not
+     (effect-affected-predicate-names (second effect)))
+    ((when imply)
+     (effect-affected-predicate-names (third effect)))
+    ((forall exists)
+     (effect-affected-predicate-names (third effect)))
+    ((increase decrease assign scale-up scale-down)
+     nil)
+    (otherwise
+     (if (symbolp (first effect))
+         (list (first effect))
+         nil))))
+
+(defun domain-affected-predicate-names (domain)
+  "Return the set of predicate-name symbols affected by any action in DOMAIN."
+  (iter (for action in (domain-actions domain))
+    (unioning (effect-affected-predicate-names (action-effect action))
+              :test #'eq)))
+
+(defun domain-static-predicates (domain)
+  "Return the predicate definitions from DOMAIN for predicates that are
+static -- i.e., not made true or false by any action effect."
+  (let ((affected (domain-affected-predicate-names domain)))
+    (remove-if #'(lambda (pred-def)
+                   (member (first pred-def) affected :test #'eq))
+               (domain-predicates domain))))
+
+(defun domain-fluent-predicates (domain)
+  "Return the predicate definitions from DOMAIN for predicates that
+may be modified -- i.e., made true or false by some action effect."
+  (let ((affected (domain-affected-predicate-names domain)))
+    (remove-if-not #'(lambda (pred-def)
+                       (member (first pred-def) affected :test #'eq))
+                   (domain-predicates domain))))
+
 (defun flatten-conjunction (conj &optional (strict t))
   "Take an s-expression and, if it is a multilayer conjunction.
 Returns a single-layer conjunction (intermediate AND's, if any,

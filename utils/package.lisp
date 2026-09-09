@@ -83,6 +83,10 @@
    #:copy-problem
    #:canonicalize-domain
 
+   ;; static/fluent predicate analysis
+   #:domain-static-predicates
+   #:domain-fluent-predicates
+
    ;; miscellany
    #:remove-domain-actions
    #:insert-domain-actions
